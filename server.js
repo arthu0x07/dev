@@ -5,7 +5,8 @@ const path = require('path');
 const PORT = 3333;
 
 const server = http.createServer((req, res) => {
-  const filePath = path.join(__dirname, req.url === '/' ? '/portfolio.html' : req.url);
+  const url = req.url === '/' ? '/index.html' : req.url;
+  const filePath = path.join(__dirname, 'src', url);
   const ext = path.extname(filePath);
   const mime = { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript' };
 
