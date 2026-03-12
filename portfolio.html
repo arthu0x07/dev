@@ -115,7 +115,7 @@
       display: flex; align-items: center; justify-content: center;
       min-height: 58vh; padding: clamp(32px,8vh,90px) var(--pad);
     }
-    .hero-inner { text-align: center; }
+    .hero-inner { text-align: center; will-change: transform; transition: opacity .2s ease; }
     .hero-title {
       font-family: 'DotGothic16', monospace;
       font-size: clamp(24px, 4.8vw, 50px); line-height: 1.3;
@@ -244,7 +244,10 @@
     .timeline::before {
       content: ''; position: absolute; left: 0; top: 6px; bottom: 0;
       width: 1px; background: var(--border);
+      transform-origin: top; transform: scaleY(0);
+      transition: transform 2s cubic-bezier(.25,.46,.45,.94);
     }
+    .timeline.line-drawn::before { transform: scaleY(1); }
 
     .tl-item {
       position: relative; padding: 0 0 48px 28px;
@@ -304,8 +307,11 @@
     .skill-pill {
       font-size: 11px; font-weight: 600; border: 1px solid var(--border);
       border-radius: 100px; padding: 5px 14px;
-      transition: background .2s, border-color .2s, color .2s;
+      opacity: 0; transform: translateY(10px) scale(.88);
+      transition: opacity .38s ease, transform .38s cubic-bezier(.34,1.56,.64,1),
+                  background .2s, border-color .2s, color .2s;
     }
+    .skill-pill.anim-in { opacity: 1; transform: none; }
     .skill-pill:hover { background: var(--black); color: var(--white); border-color: var(--black); }
 
     /* award strip */
@@ -368,11 +374,32 @@
     ═══════════════════════════════ */
     .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
     .reveal.visible { opacity: 1; transform: none; }
-    .stagger > * { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
+    .stagger > * { opacity: 0; transform: translateY(30px) scale(.94); transition: opacity .6s ease, transform .68s cubic-bezier(.34,1.56,.64,1); }
     .stagger.visible > *:nth-child(1){opacity:1;transform:none;transition-delay:0s}
     .stagger.visible > *:nth-child(2){opacity:1;transform:none;transition-delay:.1s}
     .stagger.visible > *:nth-child(3){opacity:1;transform:none;transition-delay:.2s}
     .stagger.visible > *:nth-child(4){opacity:1;transform:none;transition-delay:.3s}
+
+    /* ── Directional reveals ── */
+    .reveal-left  { opacity:0; transform:translateX(-54px); transition:opacity .7s ease, transform .78s cubic-bezier(.25,.46,.45,.94); }
+    .reveal-left.visible  { opacity:1; transform:none; }
+    .reveal-right { opacity:0; transform:translateX( 54px); transition:opacity .7s ease, transform .78s cubic-bezier(.25,.46,.45,.94); }
+    .reveal-right.visible { opacity:1; transform:none; }
+
+    /* ── Scale bounce reveal ── */
+    .reveal-scale { opacity:0; transform:scale(.86) translateY(20px); transition:opacity .65s ease, transform .75s cubic-bezier(.34,1.56,.64,1); }
+    .reveal-scale.visible { opacity:1; transform:none; }
+
+    /* ── Blur reveal ── */
+    .reveal-blur { opacity:0; filter:blur(9px); transition:opacity 1s ease, filter 1s ease; }
+    .reveal-blur.visible { opacity:1; filter:none; }
+
+    /* ── Section h2 clip-path wipe ── */
+    .section-head h2 {
+      clip-path: inset(0 102% 0 0);
+      transition: clip-path 1s .12s cubic-bezier(.25,.46,.45,.94);
+    }
+    .section-head.visible h2 { clip-path: inset(0 0% 0 0); }
 
     /* ═══════════════════════════════
        RESPONSIVE
@@ -526,7 +553,7 @@
     <div class="section-head reveal">
       <div class="section-bar"></div>
       <h2>work experience</h2>
-      <span class="section-kicker">4+ years</span>
+      <span class="section-kicker"><span data-count="4" data-suffix="+ years">4+ years</span></span>
     </div>
 
     <div class="timeline">
@@ -660,17 +687,18 @@
       <h2>about me</h2>
     </div>
 
-    <div class="about-grid reveal">
+    <div class="about-grid">
+      <!-- columns get their own directional reveals -->
       <img
-        class="bio-photo"
+        class="bio-photo reveal-left"
         src="https://www.figma.com/api/mcp/asset/315a6025-05b4-432d-bfbb-5e7f4cdb71d7"
         alt="Arthur Silva"
         onerror="this.style.background='#c8b8a2';this.src=''"
       />
-      <div>
+      <div class="reveal-right">
         <div class="bio-name">Arthur Silva</div>
         <div class="bio-headline">Software Engineer · Full-Stack Developer</div>
-        <div class="bio-desc">
+        <div class="bio-desc reveal-blur">
           Full-stack developer with 4+ years of professional experience shipping real products across healthtech, greentech and fintech. I'm obsessive about clean code, intuitive interfaces and performance — from robust NestJS APIs to pixel-perfect React UIs. Based in Rio de Janeiro, working remotely with teams worldwide.
         </div>
         <div class="bio-links">
@@ -699,7 +727,7 @@
           <span class="skill-pill">Figma</span>
         </div>
 
-        <div class="award-strip">
+        <div class="award-strip reveal">
           <div class="award-icon">🏅</div>
           <div class="award-text">
             <strong>Guardião da Performance</strong> — recognised by 1STi in Sep 2023 for excellence, consistency and technical mastery across projects.
@@ -711,13 +739,13 @@
 
   <!-- ═══ CONTACT ═══ -->
   <section id="contato">
-    <div class="contact-wrap reveal">
+    <div class="contact-wrap reveal-scale">
       <div class="contact-inner">
-        <div class="contact-left">
+        <div class="contact-left reveal-left">
           <h2>Let's build<br/>something great.</h2>
           <p>Open to freelance, full-time roles and interesting collabs.</p>
         </div>
-        <div class="contact-actions">
+        <div class="contact-actions reveal-right">
           <a href="mailto:arthur@email.com" class="btn-primary">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             Send a message
@@ -807,7 +835,7 @@ window.addEventListener('scroll',()=>{ bar.style.width=(window.scrollY/(document
 
 // ── REVEAL ──────────────────────────────────────
 const obs=new IntersectionObserver(entries=>{ entries.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);} }); },{threshold:.1});
-document.querySelectorAll('.reveal,.stagger').forEach(el=>obs.observe(el));
+document.querySelectorAll('.reveal,.stagger,.reveal-blur,.reveal-scale,.reveal-left,.reveal-right').forEach(el=>obs.observe(el));
 
 // section bars
 const barObs=new IntersectionObserver(entries=>{ entries.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('visible');barObs.unobserve(e.target);} }); },{threshold:.5});
@@ -863,6 +891,85 @@ function tilt(sel,s){
   });
 }
 tilt('.case-card',4);
+
+// ── HERO PARALLAX + FADE ────────────────────────
+const heroInner = document.querySelector('.hero-inner');
+window.addEventListener('scroll', () => {
+  if (!heroInner) return;
+  const sy = window.scrollY;
+  heroInner.style.transform = `translateY(${sy * 0.32}px)`;
+  heroInner.style.opacity = Math.max(0, 1 - sy / 400).toFixed(3);
+}, { passive: true });
+
+// ── TIMELINE LINE DRAW ───────────────────────────
+const lineObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('line-drawn'); lineObs.unobserve(e.target); }
+  });
+}, { threshold: 0.05 });
+document.querySelectorAll('.timeline').forEach(el => lineObs.observe(el));
+
+// ── SKILLS CASCADE ───────────────────────────────
+const skillsObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.skill-pill').forEach((p, i) => {
+        setTimeout(() => p.classList.add('anim-in'), i * 50);
+      });
+      skillsObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.skills-row').forEach(el => skillsObs.observe(el));
+
+// ── CASE CARDS PARALLAX DEPTH ────────────────────
+// Cards shift slightly at different rates as you scroll into them
+const casesSection = document.getElementById('cases');
+const caseCards = document.querySelectorAll('.case-card');
+window.addEventListener('scroll', () => {
+  if (!casesSection) return;
+  const rect = casesSection.getBoundingClientRect();
+  const progress = 1 - (rect.top / window.innerHeight);
+  if (progress < 0 || progress > 2.2) return;
+  const offsets = [18, -12, 14, -10];
+  caseCards.forEach((c, i) => {
+    if (!c.matches(':hover')) {
+      c.style.transform = `translateY(${offsets[i % offsets.length] * (1 - Math.min(progress, 1))}px)`;
+    }
+  });
+}, { passive: true });
+
+// ── SCROLL SPEED TILT ON SECTION BARS ────────────
+let prevSY = 0;
+window.addEventListener('scroll', () => {
+  const vel = window.scrollY - prevSY;
+  prevSY = window.scrollY;
+  document.querySelectorAll('.section-bar.visible').forEach(bar => {
+    bar.style.transform = `scaleY(1) skewY(${Math.max(-4, Math.min(4, vel * 0.15))}deg)`;
+    clearTimeout(bar._tiltTimer);
+    bar._tiltTimer = setTimeout(() => { bar.style.transform = 'scaleY(1)'; }, 180);
+  });
+}, { passive: true });
+
+// ── COUNTER ANIMATION ────────────────────────────
+function countUp(el, target, duration) {
+  let start = 0, step = target / (duration / 16);
+  const tick = () => {
+    start = Math.min(start + step, target);
+    el.textContent = Math.floor(start) + (start >= target ? el.dataset.suffix || '' : '');
+    if (start < target) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      countUp(e.target, +e.target.dataset.count, 900);
+      counterObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
 </script>
 </body>
 </html>
