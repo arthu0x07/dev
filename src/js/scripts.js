@@ -2,32 +2,72 @@
 const canvas = document.getElementById('particles-canvas');
 const ctx = canvas.getContext('2d');
 let W, H, mouse = { x: -999, y: -999 };
-function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+const isMobile = window.innerWidth < 768;
+
+function resize() {
+   W = canvas.width = window.innerWidth;
+   H = canvas.height = window.innerHeight;
+}
 resize(); window.addEventListener('resize', resize);
 document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
 class P {
    constructor() { this.init(true); }
-   init(r) { this.x = Math.random() * W; this.y = r ? Math.random() * H : -5; this.vx = (Math.random() - .5) * .42; this.vy = (Math.random() - .5) * .42; this.rad = Math.random() * 1.5 + .5; this.a = Math.random() * .3 + .08; }
+   init(r) {
+      this.x = Math.random() * W;
+      this.y = r ? Math.random() * H : -5;
+      this.vx = (Math.random() - .5) * .42;
+      this.vy = (Math.random() - .5) * .42;
+      this.rad = Math.random() * 1.5 + .5;
+      this.a = Math.random() * .3 + .08;
+   }
    update() {
       this.x += this.vx; this.y += this.vy;
-      const dx = this.x - mouse.x, dy = this.y - mouse.y, d = Math.hypot(dx, dy);
-      if (d < 88) { const f = (88 - d) / 88 * .65; this.x += dx / d * f * 2.2; this.y += dy / d * f * 2.2; }
+      const dx = this.x - mouse.x, dy = this.y - mouse.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < 7744) { // 88*88
+         const d = Math.sqrt(d2);
+         const f = (88 - d) / 88 * .65;
+         this.x += dx / d * f * 2.2; this.y += dy / d * f * 2.2;
+      }
       if (this.x < -10) this.x = W + 10; if (this.x > W + 10) this.x = -10;
       if (this.y < -10) this.y = H + 10; if (this.y > H + 10) this.y = -10;
    }
-   draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.rad, 0, Math.PI * 2); ctx.fillStyle = `rgba(0,0,0,${this.a})`; ctx.fill(); }
+   draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.rad, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,0,0,${this.a})`;
+      ctx.fill();
+   }
 }
-const pts = Array.from({ length: 72 }, () => new P());
+
+const ptsCount = isMobile ? 35 : 72;
+const pts = Array.from({ length: ptsCount }, () => new P());
+const lineDistSq = 115 * 115;
+const mouseDistSq = 150 * 150;
+
 function loop() {
    ctx.clearRect(0, 0, W, H);
    for (let i = 0; i < pts.length; i++) {
-      pts[i].update(); pts[i].draw();
+      const p1 = pts[i];
+      p1.update(); p1.draw();
       for (let j = i + 1; j < pts.length; j++) {
-         const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
-         if (d < 115) { ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.strokeStyle = `rgba(0,0,0,${(1 - d / 115) * .13})`; ctx.lineWidth = .6; ctx.stroke(); }
+         const p2 = pts[j];
+         const dx = p1.x - p2.x, dy = p1.y - p2.y;
+         const d2 = dx * dx + dy * dy;
+         if (d2 < lineDistSq) {
+            const d = Math.sqrt(d2);
+            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(0,0,0,${(1 - d / 115) * .13})`; ctx.lineWidth = .6; ctx.stroke();
+         }
       }
-      const md = Math.hypot(pts[i].x - mouse.x, pts[i].y - mouse.y);
-      if (md < 150) { ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(mouse.x, mouse.y); ctx.strokeStyle = `rgba(0,0,0,${(1 - md / 150) * .28})`; ctx.lineWidth = .7; ctx.stroke(); }
+      const mdx = p1.x - mouse.x, mdy = p1.y - mouse.y;
+      const md2 = mdx * mdx + mdy * mdy;
+      if (md2 < mouseDistSq) {
+         const md = Math.sqrt(md2);
+         ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(mouse.x, mouse.y);
+         ctx.strokeStyle = `rgba(0,0,0,${(1 - md / 150) * .28})`; ctx.lineWidth = .7; ctx.stroke();
+      }
    }
    requestAnimationFrame(loop);
 }
@@ -41,24 +81,68 @@ document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cu
 
 // ── PROGRESS ────────────────────────────────────
 const bar = document.getElementById('progress-bar');
-window.addEventListener('scroll', () => { bar.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%'; });
+let ticking = false;
+window.addEventListener('scroll', () => {
+   if (!ticking) {
+      requestAnimationFrame(() => {
+         bar.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+         ticking = false;
+      });
+      ticking = true;
+   }
+}, { passive: true });
 
 // ── REVEAL ──────────────────────────────────────
-const obs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }); }, { threshold: .1 });
+const obs = new IntersectionObserver(entries => {
+   entries.forEach(e => {
+      if (e.isIntersecting) {
+         e.target.classList.add('visible');
+         obs.unobserve(e.target);
+      }
+   });
+}, { threshold: .1 });
 document.querySelectorAll('.reveal,.stagger,.reveal-blur,.reveal-scale,.reveal-left,.reveal-right').forEach(el => obs.observe(el));
 
 // section bars
-const barObs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); barObs.unobserve(e.target); } }); }, { threshold: .5 });
+const barObs = new IntersectionObserver(entries => {
+   entries.forEach(e => {
+      if (e.isIntersecting) {
+         e.target.classList.add('visible');
+         barObs.unobserve(e.target);
+      }
+   });
+}, { threshold: .5 });
 document.querySelectorAll('.section-bar').forEach(el => barObs.observe(el));
 
 // timeline items (staggered)
-const tlObs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); tlObs.unobserve(e.target); } }); }, { threshold: .12 });
-document.querySelectorAll('.tl-item').forEach((el, i) => { el.style.transitionDelay = `${i * 0.08}s`; tlObs.observe(el); });
+const tlObs = new IntersectionObserver(entries => {
+   entries.forEach(e => {
+      if (e.isIntersecting) {
+         e.target.classList.add('visible');
+         tlObs.unobserve(e.target);
+      }
+   });
+}, { threshold: .12 });
+document.querySelectorAll('.tl-item').forEach((el, i) => {
+   el.style.transitionDelay = `${i * 0.08}s`;
+   tlObs.observe(el);
+});
 
 // ── ACTIVE NAV ──────────────────────────────────
 const navLinks = document.querySelectorAll('.side-nav a');
-const secObs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { navLinks.forEach(l => l.classList.remove('active')); const l = document.querySelector(`.side-nav a[href="#${e.target.id}"]`); if (l) l.classList.add('active'); } }); }, { rootMargin: '-40% 0px -50% 0px' });
-['inicio', 'cases', 'experiencia', 'sobre', 'contato'].forEach(id => { const el = document.getElementById(id); if (el) secObs.observe(el); });
+const secObs = new IntersectionObserver(entries => {
+   entries.forEach(e => {
+      if (e.isIntersecting) {
+         navLinks.forEach(l => l.classList.remove('active'));
+         const l = document.querySelector(`.side-nav a[href="#${e.target.id}"]`);
+         if (l) l.classList.add('active');
+      }
+   });
+}, { rootMargin: '-40% 0px -50% 0px' });
+['inicio', 'cases', 'experiencia', 'sobre', 'contato'].forEach(id => {
+   const el = document.getElementById(id);
+   if (el) secObs.observe(el);
+});
 
 // ── MOBILE NAV TAB ───────────────────────────────
 const navTab = document.getElementById('nav-tab');
@@ -88,33 +172,64 @@ typedEl.parentElement.appendChild(ghost);
 let ri = 0, ci = roles[0].length, del = false;
 function type() {
    const t = roles[ri];
-   if (!del) { if (ci < t.length) { typedEl.textContent = t.slice(0, ++ci); setTimeout(type, 60); } else { setTimeout(() => { del = true; type(); }, 2600); } }
-   else { if (ci > 0) { typedEl.textContent = t.slice(0, --ci); setTimeout(type, 34); } else { del = false; ri = (ri + 1) % roles.length; setTimeout(type, 360); } }
+   if (!del) {
+      if (ci < t.length) {
+         typedEl.textContent = t.slice(0, ++ci);
+         setTimeout(type, 60);
+      } else {
+         setTimeout(() => { del = true; type(); }, 2600);
+      }
+   }
+   else {
+      if (ci > 0) {
+         typedEl.textContent = t.slice(0, --ci);
+         setTimeout(type, 34);
+      } else {
+         del = false; ri = (ri + 1) % roles.length;
+         setTimeout(type, 360);
+      }
+   }
 }
 setTimeout(type, 2600);
 
 // ── CARD TILT ───────────────────────────────────
 function tilt(sel, s) {
    document.querySelectorAll(sel).forEach(el => {
-      el.addEventListener('mousemove', e => { const r = el.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - .5; const y = (e.clientY - r.top) / r.height - .5; el.style.transform = `translateY(-7px) rotateY(${x * s * 2}deg) rotateX(${-y * s * 2}deg)`; el.style.transition = 'transform .05s'; });
-      el.addEventListener('mouseleave', () => { el.style.transform = ''; el.style.transition = 'transform .35s ease'; });
+      el.addEventListener('mousemove', e => {
+         const r = el.getBoundingClientRect();
+         const x = (e.clientX - r.left) / r.width - .5;
+         const y = (e.clientY - r.top) / r.height - .5;
+         el.style.transform = `translateY(-7px) rotateY(${x * s * 2}deg) rotateX(${-y * s * 2}deg)`;
+         el.style.transition = 'transform .05s';
+      });
+      el.addEventListener('mouseleave', () => {
+         el.style.transform = ''; el.style.transition = 'transform .35s ease';
+      });
    });
 }
 tilt('.case-card', 4);
 
 // ── HERO PARALLAX + FADE ────────────────────────
 const heroInner = document.querySelector('.hero-inner');
+let heroTicking = false;
 window.addEventListener('scroll', () => {
-   if (!heroInner) return;
-   const sy = window.scrollY;
-   heroInner.style.transform = `translateY(${sy * 0.32}px)`;
-   heroInner.style.opacity = Math.max(0, 1 - sy / 400).toFixed(3);
+   if (!heroInner || heroTicking) return;
+   requestAnimationFrame(() => {
+      const sy = window.scrollY;
+      heroInner.style.transform = `translateY(${sy * 0.32}px)`;
+      heroInner.style.opacity = Math.max(0, 1 - sy / 400).toFixed(3);
+      heroTicking = false;
+   });
+   heroTicking = true;
 }, { passive: true });
 
 // ── TIMELINE LINE DRAW ───────────────────────────
 const lineObs = new IntersectionObserver(entries => {
    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('line-drawn'); lineObs.unobserve(e.target); }
+      if (e.isIntersecting) {
+         e.target.classList.add('line-drawn');
+         lineObs.unobserve(e.target);
+      }
    });
 }, { threshold: 0.05 });
 document.querySelectorAll('.timeline').forEach(el => lineObs.observe(el));
@@ -133,32 +248,43 @@ const skillsObs = new IntersectionObserver(entries => {
 document.querySelectorAll('.skills-row').forEach(el => skillsObs.observe(el));
 
 // ── CASE CARDS PARALLAX DEPTH ────────────────────
-// Cards shift slightly at different rates as you scroll into them
 const casesSection = document.getElementById('cases');
 const caseCards = document.querySelectorAll('.case-card');
+let casesTicking = false;
 window.addEventListener('scroll', () => {
-   if (!casesSection) return;
-   const rect = casesSection.getBoundingClientRect();
-   const progress = 1 - (rect.top / window.innerHeight);
-   if (progress < 0 || progress > 2.2) return;
-   const offsets = [18, -12, 14, -10];
-   caseCards.forEach((c, i) => {
-      if (!c.matches(':hover')) {
-         c.style.transform = `translateY(${offsets[i % offsets.length] * (1 - Math.min(progress, 1))}px)`;
+   if (!casesSection || casesTicking) return;
+   requestAnimationFrame(() => {
+      const rect = casesSection.getBoundingClientRect();
+      const progress = 1 - (rect.top / window.innerHeight);
+      if (progress >= 0 && progress <= 2.2) {
+         const offsets = [18, -12, 14, -10];
+         caseCards.forEach((c, i) => {
+            if (!c.matches(':hover')) {
+               c.style.transform = `translateY(${offsets[i % offsets.length] * (1 - Math.min(progress, 1))}px)`;
+            }
+         });
       }
+      casesTicking = false;
    });
+   casesTicking = true;
 }, { passive: true });
 
 // ── SCROLL SPEED TILT ON SECTION BARS ────────────
 let prevSY = 0;
+let barsTicking = false;
 window.addEventListener('scroll', () => {
-   const vel = window.scrollY - prevSY;
-   prevSY = window.scrollY;
-   document.querySelectorAll('.section-bar.visible').forEach(bar => {
-      bar.style.transform = `scaleY(1) skewY(${Math.max(-4, Math.min(4, vel * 0.15))}deg)`;
-      clearTimeout(bar._tiltTimer);
-      bar._tiltTimer = setTimeout(() => { bar.style.transform = 'scaleY(1)'; }, 180);
+   if (barsTicking) return;
+   requestAnimationFrame(() => {
+      const vel = window.scrollY - prevSY;
+      prevSY = window.scrollY;
+      document.querySelectorAll('.section-bar.visible').forEach(bar => {
+         bar.style.transform = `scaleY(1) skewY(${Math.max(-4, Math.min(4, vel * 0.15))}deg)`;
+         clearTimeout(bar._tiltTimer);
+         bar._tiltTimer = setTimeout(() => { bar.style.transform = 'scaleY(1)'; }, 180);
+      });
+      barsTicking = false;
    });
+   barsTicking = true;
 }, { passive: true });
 
 // ── TEXT SCRAMBLE ────────────────────────────────
@@ -202,7 +328,10 @@ class TextScramble {
       }
       this.el.innerHTML = output;
       if (complete === this.queue.length) { this.resolve(); }
-      else { this.frameRequest = requestAnimationFrame(this.update); this.frame++; }
+      else {
+         this.frameRequest = requestAnimationFrame(this.update);
+         this.frame++;
+      }
    }
 }
 const scrambleObs = new IntersectionObserver(entries => {

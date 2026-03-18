@@ -153,7 +153,8 @@ section { padding: clamp(56px,8vw,112px) var(--pad); }
   width: 4px; height: clamp(32px,4vw,52px);
   background: var(--black); border-radius: 2px; flex-shrink: 0;
   transform-origin: top; transform: scaleY(0);
-  transition: transform .5s ease;
+  transition: transform .6s cubic-bezier(.19,1,.22,1);
+  will-change: transform;
 }
 .section-bar.visible { transform: scaleY(1); }
 .section-head h2 { font-weight: 800; font-size: clamp(20px,3.2vw,30px); }
@@ -173,9 +174,10 @@ section { padding: clamp(56px,8vw,112px) var(--pad); }
 .case-card {
   border-radius: 16px; overflow: hidden; position: relative;
   aspect-ratio: 3/4; cursor: pointer;
-  transition: transform .35s ease, box-shadow .35s ease;
+  transition: transform .45s cubic-bezier(.165,.84,.44,1), box-shadow .45s cubic-bezier(.165,.84,.44,1);
+  will-change: transform;
 }
-.case-card:hover { transform: translateY(-8px); box-shadow: 0 24px 48px rgba(0,0,0,.14); }
+.case-card:hover { transform: translateY(-12px); box-shadow: 0 32px 64px rgba(0,0,0,.18); }
 
 .case-card:nth-child(1) .case-bg { background: linear-gradient(145deg,#0b1e12,#1a4731,#2d7a50); }
 .case-card:nth-child(2) .case-bg { background: linear-gradient(145deg,#0e1a2b,#1a3a5c,#1e5f9e); }
@@ -241,7 +243,8 @@ section { padding: clamp(56px,8vw,112px) var(--pad); }
 .tl-item {
   position: relative; padding: 0 0 48px 28px;
   opacity: 0; transform: translateX(-16px);
-  transition: opacity .5s ease, transform .5s ease;
+  transition: opacity .6s ease, transform .6s cubic-bezier(.215,.61,.355,1);
+  will-change: opacity, transform;
 }
 .tl-item.visible { opacity: 1; transform: none; }
 .tl-item:last-child { padding-bottom: 0; }
@@ -361,26 +364,26 @@ footer {
 /* ═══════════════════════════════
    REVEAL
 ═══════════════════════════════ */
-.reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s cubic-bezier(.215,.61,.355,1); will-change: opacity, transform; }
 .reveal.visible { opacity: 1; transform: none; }
-.stagger > * { opacity: 0; transform: translateY(30px) scale(.94); transition: opacity .6s ease, transform .68s cubic-bezier(.34,1.56,.64,1); }
+.stagger > * { opacity: 0; transform: translateY(30px) scale(.94); transition: opacity .7s ease, transform .8s cubic-bezier(.34,1.56,.64,1); will-change: opacity, transform; }
 .stagger.visible > *:nth-child(1){opacity:1;transform:none;transition-delay:0s}
 .stagger.visible > *:nth-child(2){opacity:1;transform:none;transition-delay:.1s}
 .stagger.visible > *:nth-child(3){opacity:1;transform:none;transition-delay:.2s}
 .stagger.visible > *:nth-child(4){opacity:1;transform:none;transition-delay:.3s}
 
 /* ── Directional reveals ── */
-.reveal-left  { opacity:0; transform:translateX(-54px); transition:opacity .7s ease, transform .78s cubic-bezier(.25,.46,.45,.94); }
+.reveal-left  { opacity:0; transform:translateX(-54px); transition:opacity .8s ease, transform .8s cubic-bezier(.25,.46,.45,.94); will-change: opacity, transform; }
 .reveal-left.visible  { opacity:1; transform:none; }
-.reveal-right { opacity:0; transform:translateX( 54px); transition:opacity .7s ease, transform .78s cubic-bezier(.25,.46,.45,.94); }
+.reveal-right { opacity:0; transform:translateX( 54px); transition:opacity .8s ease, transform .8s cubic-bezier(.25,.46,.45,.94); will-change: opacity, transform; }
 .reveal-right.visible { opacity:1; transform:none; }
 
 /* ── Scale bounce reveal ── */
-.reveal-scale { opacity:0; transform:scale(.86) translateY(20px); transition:opacity .65s ease, transform .75s cubic-bezier(.34,1.56,.64,1); }
+.reveal-scale { opacity:0; transform:scale(.86) translateY(20px); transition:opacity .7s ease, transform .85s cubic-bezier(.34,1.56,.64,1); will-change: opacity, transform; }
 .reveal-scale.visible { opacity:1; transform:none; }
 
 /* ── Blur reveal ── */
-.reveal-blur { opacity:0; filter:blur(9px); transition:opacity 1s ease, filter 1s ease; }
+.reveal-blur { opacity:0; filter:blur(9px); transition:opacity 1.2s ease, filter 1.2s ease; will-change: opacity, filter; }
 .reveal-blur.visible { opacity:1; filter:none; }
 
 /* ── Scramble char (hacker aesthetic while decoding) ── */
