@@ -21,6 +21,7 @@
 }
 
 html { scroll-behavior: smooth; }
+::selection { background: var(--black); color: var(--white); }
 body {
   background: var(--white);
   color: var(--black);
