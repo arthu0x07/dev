@@ -84,6 +84,12 @@ document.addEventListener('visibilitychange', () => {
 // ── CURSOR ──────────────────────────────────────
 if (!isMobile) {
    const cur = document.getElementById('cursor'), ring = document.getElementById('cursor-ring');
+   // add text element for "view" label
+   const curText = document.createElement('span');
+   curText.className = 'cursor-text';
+   curText.textContent = 'view';
+   ring.appendChild(curText);
+
    let mx = 0, my = 0, rx = 0, ry = 0, cursorIdle = 0;
    document.addEventListener('mousemove', e => {
       mx = e.clientX; my = e.clientY;
@@ -99,6 +105,20 @@ if (!isMobile) {
    })();
    document.addEventListener('mousemove', () => {
       if (cursorIdle >= 120) { cursorIdle = 0; (function ar() { rx += (mx - rx) * .12; ry += (my - ry) * .12; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; cursorIdle++; if (cursorIdle < 120) requestAnimationFrame(ar); })(); }
+   });
+
+   // reactive cursor: grow on links/buttons, "view" on case cards
+   function setCursorState(state) {
+      cur.className = state ? 'cursor-' + state : '';
+      ring.className = state ? 'cursor-' + state : '';
+   }
+   document.addEventListener('mouseover', e => {
+      const el = e.target.closest('.case-card');
+      if (el) { setCursorState('card'); return; }
+      if (e.target.closest('a, button, .btn-primary, .skill-pill, .theme-toggle, .lang-toggle, .social-row a')) {
+         setCursorState('hover'); return;
+      }
+      setCursorState(null);
    });
 }
 
@@ -507,10 +527,13 @@ if (!isMobile) {
    });
 }
 
-// ── LOADER ───────────────────────────────────────
+// ── LOADER + PAGE ENTRY ──────────────────────────
 const loader = document.getElementById('loader');
 window.addEventListener('load', () => {
-   setTimeout(() => { loader.classList.add('done'); }, 800);
+   setTimeout(() => {
+      loader.classList.add('done');
+      document.querySelector('.page').classList.add('page-enter');
+   }, 800);
 });
 
 // ── DARK MODE ────────────────────────────────────
@@ -805,3 +828,44 @@ origModalCards.forEach(card => {
       document.body.style.overflow = 'hidden';
    });
 });
+
+// ── EASTER EGG (footer logo click) ───────────────
+(function() {
+   const fLogo = document.getElementById('f-logo');
+   if (!fLogo) return;
+   let active = false;
+
+   fLogo.addEventListener('click', () => {
+      if (active) return;
+      active = true;
+
+      // scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // rainbow overlay
+      const ov = document.createElement('div');
+      ov.style.cssText = 'position:fixed;inset:0;z-index:99998;pointer-events:none;background:linear-gradient(135deg,rgba(255,0,0,.1),rgba(255,165,0,.1),rgba(255,255,0,.1),rgba(0,128,0,.1),rgba(0,0,255,.1),rgba(75,0,130,.1),rgba(238,130,238,.1));animation:eggRainbow 3s linear infinite;mix-blend-mode:overlay;';
+      document.body.appendChild(ov);
+
+      // party styles
+      const style = document.createElement('style');
+      style.textContent = '@keyframes eggRainbow{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}' +
+         '#particles-canvas{filter:invert(1) hue-rotate(0deg)!important;animation:eggRainbow 2s linear infinite!important;opacity:1!important;}' +
+         '.hero-title{animation:eggRainbow 1.5s linear infinite!important;}' +
+         '.skill-pill{animation:eggRainbow 2s linear infinite!important;animation-delay:calc(var(--i,0)*.1s)!important;}' +
+         '.case-card .case-bg{animation:eggRainbow 3s linear infinite!important;}' +
+         '.logo,.f-logo{animation:eggRainbow 1s linear infinite!important;}';
+      document.head.appendChild(style);
+
+      // set skill pill delays
+      document.querySelectorAll('.skill-pill').forEach((p, i) => p.style.setProperty('--i', i));
+
+      console.log('%c✨ PARTY MODE! ✨', 'font-size:20px;font-weight:bold;color:#ff00ff;text-shadow:2px 2px #00ffff;');
+
+      setTimeout(() => {
+         ov.remove();
+         style.remove();
+         active = false;
+      }, 15000);
+   });
+})();
