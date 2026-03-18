@@ -1,9 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>arthu0x | Full-Stack Engineer</title>
+  <meta name="description" content="Arthur Silva — Full-Stack Engineer with 4+ years shipping products across healthtech, greentech and fintech. React, Node.js, TypeScript, React Native, AWS." />
+  <meta name="author" content="Arthur Silva" />
+  <meta name="keywords" content="full-stack developer, react, node.js, typescript, portfolio, software engineer" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="arthu0x | Full-Stack Engineer" />
+  <meta property="og:description" content="Full-Stack Engineer · 4+ years · React, Node.js, TypeScript, React Native, AWS" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="arthu0x | Full-Stack Engineer" />
+  <meta name="twitter:description" content="Full-Stack Engineer · 4+ years · React, Node.js, TypeScript, React Native, AWS" />
+
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+
   <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,6 +29,12 @@
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
+
+<!-- ═══ LOADER ═══ -->
+<div id="loader">
+  <div class="loader-logo">arthu0x</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+</div>
 
 <canvas id="particles-canvas"></canvas>
 <div id="progress-bar"></div>
@@ -37,9 +61,15 @@
   <!-- ═══ HEADER ═══ -->
   <header id="inicio">
     <div class="logo">arthu0x</div>
-    <div class="header-cta">
-      <div class="service">freelance service</div>
-      <div class="discount">open to work</div>
+    <div class="header-right">
+      <div class="header-cta">
+        <div class="service">freelance service</div>
+        <div class="discount">open to work</div>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
     </div>
   </header>
 
@@ -65,6 +95,48 @@
     </div>
   </section>
 
+  <!-- ═══ LOGO STRIP ═══ -->
+  <div class="logo-strip reveal">
+    <span class="logo-strip-label">Trusted by</span>
+    <div class="logo-strip-track">
+      <div class="logo-strip-slide">
+        <span class="strip-logo">Moss.Earth</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Hospital Sírio-Libanês</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">1STi</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Eu Médico Residente</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Sofya</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Cubos Tecnologia</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Zig</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Luta pela Paz</span>
+        <span class="strip-sep">·</span>
+        <!-- duplicate for seamless loop -->
+        <span class="strip-logo">Moss.Earth</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Hospital Sírio-Libanês</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">1STi</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Eu Médico Residente</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Sofya</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Cubos Tecnologia</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Zig</span>
+        <span class="strip-sep">·</span>
+        <span class="strip-logo">Luta pela Paz</span>
+        <span class="strip-sep">·</span>
+      </div>
+    </div>
+  </div>
+
   <div class="section-divider" style="max-width:calc(100% - var(--pad)*2);margin:0 auto"></div>
 
   <!-- ═══ CASES ═══ -->
@@ -77,7 +149,7 @@
     <div class="cases-grid">
 
       <!-- Moss.Earth -->
-      <div class="case-card">
+      <div class="case-card" data-modal="moss">
         <div class="case-bg"></div>
         <div class="case-screen"><div class="case-dots"><span></span><span></span><span></span></div></div>
         <div class="case-logo">Moss.Earth</div>
@@ -86,10 +158,11 @@
           <div class="case-title">Carbon Credit Platform</div>
           <div class="case-period">2021 · Montevideo, UY (Remote)</div>
         </div>
+        <div class="case-hover-cta">View details →</div>
       </div>
 
       <!-- Hospital Sírio-Libanês -->
-      <div class="case-card">
+      <div class="case-card" data-modal="sirio">
         <div class="case-bg"></div>
         <div class="case-screen"><div class="case-dots"><span></span><span></span><span></span></div></div>
         <div class="case-logo">Sírio-Libanês</div>
@@ -98,10 +171,11 @@
           <div class="case-title">Electronic Medical Record</div>
           <div class="case-period">2022–2024 · São Paulo (Remote)</div>
         </div>
+        <div class="case-hover-cta">View details →</div>
       </div>
 
       <!-- Eu Médico Residente -->
-      <div class="case-card">
+      <div class="case-card" data-modal="eumedico">
         <div class="case-bg"></div>
         <div class="case-screen"><div class="case-dots"><span></span><span></span><span></span></div></div>
         <div class="case-logo">Eu Médico</div>
@@ -110,10 +184,11 @@
           <div class="case-title">Medical Residency Platform</div>
           <div class="case-period">2024–2025 · Recife (Remote)</div>
         </div>
+        <div class="case-hover-cta">View details →</div>
       </div>
 
       <!-- Zig / Cubos -->
-      <div class="case-card">
+      <div class="case-card" data-modal="zig">
         <div class="case-bg"></div>
         <div class="case-screen"><div class="case-dots"><span></span><span></span><span></span></div></div>
         <div class="case-logo">Zig · Cubos</div>
@@ -122,8 +197,31 @@
           <div class="case-title">Table Management & Payments</div>
           <div class="case-period">2025–present · Remote</div>
         </div>
+        <div class="case-hover-cta">View details →</div>
       </div>
 
+    </div>
+  </section>
+
+  <!-- ═══ STATS ═══ -->
+  <section class="stats-section">
+    <div class="stats-grid reveal">
+      <div class="stat-card">
+        <div class="stat-number" data-count="4" data-suffix="+">0</div>
+        <div class="stat-label">Years of experience</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" data-count="6" data-suffix="">0</div>
+        <div class="stat-label">Companies</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" data-count="4" data-suffix="">0</div>
+        <div class="stat-label">Industries</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" data-count="18" data-suffix="+">0</div>
+        <div class="stat-label">Technologies</div>
+      </div>
     </div>
   </section>
 
@@ -271,7 +369,6 @@
     </div>
 
     <div class="about-grid">
-      <!-- columns get their own directional reveals -->
       <img
         class="bio-photo reveal-left"
         src="https://www.figma.com/api/mcp/asset/315a6025-05b4-432d-bfbb-5e7f4cdb71d7"
@@ -286,9 +383,15 @@
         </div>
         <div class="bio-links">
           <a href="https://www.linkedin.com/in/arthu0x7/" target="_blank" class="bio-link">LinkedIn</a>
-          <a href="#" class="bio-link">GitHub</a>
+          <a href="https://github.com/arthu0x7" target="_blank" class="bio-link">GitHub</a>
           <a href="mailto:arthur@email.com" class="bio-link">Email</a>
         </div>
+
+        <!-- Radar Chart -->
+        <div class="radar-wrap reveal-scale">
+          <svg id="radar-chart" viewBox="0 0 200 200" class="radar-svg"></svg>
+        </div>
+
         <div class="skills-row">
           <span class="skill-pill">JavaScript</span>
           <span class="skill-pill">TypeScript</span>
@@ -336,20 +439,16 @@
             Send a message
           </a>
           <div class="social-row">
-            <!-- LinkedIn -->
             <a href="https://www.linkedin.com/in/arthu0x7/" target="_blank" title="LinkedIn" class="magnetic">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
             </a>
-            <!-- GitHub -->
-            <a href="#" title="GitHub" class="magnetic">
+            <a href="https://github.com/arthu0x7" target="_blank" title="GitHub" class="magnetic">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
             </a>
-            <!-- Instagram -->
-            <a href="#" title="Instagram" class="magnetic">
+            <a href="https://instagram.com/arthu0x7" target="_blank" title="Instagram" class="magnetic">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
             </a>
-            <!-- Figma -->
-            <a href="#" title="Figma" class="magnetic">
+            <a href="https://figma.com/@arthu0x7" target="_blank" title="Figma" class="magnetic">
               <svg viewBox="0 0 38 57" style="width:14px;height:20px">
                 <path d="M9.5 57C14.75 57 19 52.75 19 47.5V38H9.5C4.25 38 0 42.25 0 47.5S4.25 57 9.5 57z" fill="#0ACF83"/>
                 <path d="M0 28.5C0 23.25 4.25 19 9.5 19H19v19H9.5C4.25 38 0 33.75 0 28.5z" fill="#A259FF"/>
@@ -371,6 +470,20 @@
   </footer>
 
 </div><!-- .page -->
+
+<!-- ═══ CASE MODAL ═══ -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" id="modal-close" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="modal-tag" id="modal-tag"></div>
+    <h2 class="modal-title" id="modal-title"></h2>
+    <div class="modal-period" id="modal-period"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-stack" id="modal-stack"></div>
+  </div>
+</div>
 
 <script src="js/scripts.js"></script>
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>

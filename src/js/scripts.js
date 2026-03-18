@@ -247,8 +247,9 @@ const revealObs = new IntersectionObserver(entries => {
          return;
       }
 
-      // counter
-      if (el.dataset.count) {
+      // counter (stat-number and data-count elements)
+      if (el.dataset.count && !el.dataset.counted) {
+         el.dataset.counted = '1';
          countUp(el, +el.dataset.count, 900);
          revealObs.unobserve(el);
          return;
@@ -263,7 +264,7 @@ const revealObs = new IntersectionObserver(entries => {
 // register all elements
 document.querySelectorAll(
    '.reveal,.stagger,.reveal-blur,.reveal-scale,.reveal-left,.reveal-right,.reveal-rotate,.reveal-clip,.reveal-pop,.section-divider,' +
-   '.section-bar,.tl-item,.skills-row,.timeline,.hero-badges,.cases-grid,.section-head,[data-count],footer'
+   '.section-bar,.tl-item,.skills-row,.timeline,.hero-badges,.cases-grid,.section-head,[data-count],.stat-number,footer'
 ).forEach((el, i) => {
    // stagger delays for timeline items
    if (el.classList.contains('tl-item')) el.style.transitionDelay = `${i * 0.08}s`;
@@ -472,3 +473,164 @@ if (!isMobile) {
       });
    });
 }
+
+// ── LOADER ───────────────────────────────────────
+const loader = document.getElementById('loader');
+window.addEventListener('load', () => {
+   setTimeout(() => { loader.classList.add('done'); }, 1600);
+});
+
+// ── DARK MODE ────────────────────────────────────
+const themeToggle = document.getElementById('theme-toggle');
+const html = document.documentElement;
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) html.setAttribute('data-theme', savedTheme);
+
+themeToggle.addEventListener('click', () => {
+   const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+   html.setAttribute('data-theme', next);
+   localStorage.setItem('theme', next);
+});
+
+// ── CASE MODAL ───────────────────────────────────
+const modalData = {
+   moss: {
+      tag: 'GreenTech · Fintech',
+      title: 'Moss.Earth — Carbon Credit Platform',
+      period: 'Jan 2021 – Nov 2021 · Montevideo, UY (Remote)',
+      body: `<h3>The Challenge</h3>
+<p>Build a B2B platform for carbon credit trading and token control, improving transparency in environmental transactions.</p>
+<h3>What I Built</h3>
+<ul>
+<li>Advanced area-calculation tool integrating real-time maps and government data</li>
+<li>Optimised Amazon preservation analysis workflows</li>
+<li>Interactive dashboards for carbon credit tracking</li>
+</ul>
+<h3>Impact</h3>
+<p>Significantly reduced field work time for preservation analysis — enabling faster decision-making for environmental projects.</p>`,
+      stack: ['React.js', 'TypeScript', 'Maps API', 'Node.js']
+   },
+   sirio: {
+      tag: 'HealthTech · Enterprise',
+      title: 'Hospital Sírio-Libanês — Electronic Medical Record',
+      period: 'Jan 2022 – Jun 2024 · São Paulo (Remote)',
+      body: `<h3>The Challenge</h3>
+<p>Build a complex web platform enabling doctors to schedule exams, prescribe medication and book surgeries at one of Brazil's top hospitals.</p>
+<h3>What I Built</h3>
+<ul>
+<li>Full electronic medical record web platform</li>
+<li>Mobile version using React Native</li>
+<li>AI-powered voice transcription tool for surgical documentation</li>
+<li>Started with university portal (Cruzeiro do Sul) using React + Gatsby</li>
+</ul>
+<h3>Impact</h3>
+<p>Digitised critical medical workflows for a major hospital, improving doctor efficiency and patient record accuracy.</p>`,
+      stack: ['React.js', 'React Native', 'TypeScript', 'Gatsby', 'GraphQL', 'Docker', 'AWS', 'Styled-components', 'Jest']
+   },
+   eumedico: {
+      tag: 'HealthTech · SaaS',
+      title: 'Eu Médico Residente — Medical Residency Platform',
+      period: 'Jun 2024 – Oct 2025 · Recife (Remote)',
+      body: `<h3>The Challenge</h3>
+<p>Build and scale a SaaS platform for medical residency preparation, handling complex server-side logic and multiple client applications.</p>
+<h3>What I Built</h3>
+<ul>
+<li>Server-side logic with NestJS + Clean Architecture</li>
+<li>API integrations and optimised UIs across web and mobile</li>
+<li>Automated test suites ensuring quality and security</li>
+<li>Supported team through code reviews and pair programming</li>
+</ul>
+<h3>Impact</h3>
+<p>Applied Clean Architecture concepts across multiple projects, improving codebase maintainability and team velocity.</p>`,
+      stack: ['NestJS', 'React', 'React Native', 'Next.js', 'TypeScript', 'PostgreSQL', 'AWS', 'Prisma', 'GraphQL', 'Tailwind', 'Jest']
+   },
+   zig: {
+      tag: 'Fintech · Payments',
+      title: 'Zig / Cubos — Table Management & Payments',
+      period: 'Jun 2025 – present · Remote',
+      body: `<h3>The Challenge</h3>
+<p>Develop and maintain a table management system used at large events and establishments, handling real-time payments at scale.</p>
+<h3>What I Built</h3>
+<ul>
+<li>Real-time payment sessions and bill splitting flows</li>
+<li>Payment gateway integration with offline-first processing</li>
+<li>Monitoring and production issue resolution</li>
+<li>Mentoring new team members through code reviews</li>
+</ul>
+<h3>Impact</h3>
+<p>Guaranteed operations without connectivity through offline-first architecture, critical for large events with unreliable networks.</p>`,
+      stack: ['TypeScript', 'Node.js', 'React.js', 'PostgreSQL', 'Redis', 'Docker', 'Kubernetes', 'Jest', 'GitLab']
+   }
+};
+
+const overlay = document.getElementById('modal-overlay');
+const modalClose = document.getElementById('modal-close');
+
+document.querySelectorAll('.case-card[data-modal]').forEach(card => {
+   card.addEventListener('click', () => {
+      const key = card.dataset.modal;
+      const d = modalData[key];
+      if (!d) return;
+      document.getElementById('modal-tag').textContent = d.tag;
+      document.getElementById('modal-title').textContent = d.title;
+      document.getElementById('modal-period').textContent = d.period;
+      document.getElementById('modal-body').innerHTML = d.body;
+      document.getElementById('modal-stack').innerHTML = d.stack.map(s => `<span>${s}</span>`).join('');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+   });
+});
+
+function closeModal() {
+   overlay.classList.remove('open');
+   document.body.style.overflow = '';
+}
+modalClose.addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── RADAR CHART ──────────────────────────────────
+(function drawRadar() {
+   const svg = document.getElementById('radar-chart');
+   if (!svg) return;
+   const cx = 100, cy = 100, maxR = 75;
+   const axes = [
+      { label: 'Frontend', value: 0.95 },
+      { label: 'Backend', value: 0.82 },
+      { label: 'Mobile', value: 0.78 },
+      { label: 'DevOps', value: 0.68 },
+      { label: 'Database', value: 0.80 },
+      { label: 'Testing', value: 0.72 },
+   ];
+   const n = axes.length;
+   const angleStep = (Math.PI * 2) / n;
+
+   function polar(i, r) {
+      const angle = angleStep * i - Math.PI / 2;
+      return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+   }
+
+   let html = '';
+   // grid rings
+   [0.25, 0.5, 0.75, 1].forEach(pct => {
+      const pts = Array.from({ length: n }, (_, i) => polar(i, maxR * pct).join(',')).join(' ');
+      html += `<polygon points="${pts}" fill="none" stroke="var(--border)" stroke-width="0.5"/>`;
+   });
+   // axis lines
+   for (let i = 0; i < n; i++) {
+      const [x, y] = polar(i, maxR);
+      html += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--border)" stroke-width="0.5"/>`;
+   }
+   // data polygon
+   const dataPts = axes.map((a, i) => polar(i, maxR * a.value).join(',')).join(' ');
+   html += `<polygon points="${dataPts}" fill="rgba(10,10,10,.08)" stroke="var(--black)" stroke-width="1.5"/>`;
+   // dots + labels
+   axes.forEach((a, i) => {
+      const [dx, dy] = polar(i, maxR * a.value);
+      html += `<circle cx="${dx}" cy="${dy}" r="3" fill="var(--black)"/>`;
+      const [lx, ly] = polar(i, maxR + 14);
+      const anchor = lx < cx - 5 ? 'end' : lx > cx + 5 ? 'start' : 'middle';
+      html += `<text x="${lx}" y="${ly + 3}" text-anchor="${anchor}" font-size="8" font-weight="600" fill="var(--gray)" font-family="Manrope,sans-serif">${a.label}</text>`;
+   });
+   svg.innerHTML = html;
+})();
