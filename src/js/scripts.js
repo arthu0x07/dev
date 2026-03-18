@@ -101,7 +101,7 @@ const obs = new IntersectionObserver(entries => {
       }
    });
 }, { threshold: .1 });
-document.querySelectorAll('.reveal,.stagger,.reveal-blur,.reveal-scale,.reveal-left,.reveal-right').forEach(el => obs.observe(el));
+document.querySelectorAll('.reveal,.stagger,.reveal-blur,.reveal-scale,.reveal-left,.reveal-right,.reveal-rotate,.reveal-clip,.reveal-pop,.section-divider').forEach(el => obs.observe(el));
 
 // section bars
 const barObs = new IntersectionObserver(entries => {
@@ -416,3 +416,100 @@ const counterObs = new IntersectionObserver(entries => {
    });
 }, { threshold: 0.5 });
 document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
+
+// ── HERO BADGES CASCADE ─────────────────────────
+const heroBadges = document.querySelectorAll('.hero-badge');
+const badgesObs = new IntersectionObserver(([entry]) => {
+   if (entry.isIntersecting) {
+      heroBadges.forEach((b, i) => {
+         setTimeout(() => b.classList.add('anim-in'), 200 + i * 120);
+      });
+      badgesObs.disconnect();
+   }
+}, { threshold: 0.3 });
+const badgesWrap = document.querySelector('.hero-badges');
+if (badgesWrap) badgesObs.observe(badgesWrap);
+
+// ── CASE CARDS 3D SEQUENTIAL REVEAL ──────────────
+const cardRevealObs = new IntersectionObserver(entries => {
+   entries.forEach(e => {
+      if (e.isIntersecting) {
+         const cards = e.target.querySelectorAll('.case-card');
+         cards.forEach((c, i) => {
+            setTimeout(() => c.classList.add('card-visible'), i * 180);
+         });
+         cardRevealObs.unobserve(e.target);
+      }
+   });
+}, { threshold: 0.08 });
+const casesGrid = document.querySelector('.cases-grid');
+if (casesGrid) cardRevealObs.observe(casesGrid);
+
+// ── TIMELINE TAGS STAGGER ────────────────────────
+document.querySelectorAll('.tl-item').forEach(item => {
+   item.querySelectorAll('.tl-tag').forEach((tag, i) => {
+      tag.style.transitionDelay = `${0.3 + i * 0.06}s`;
+   });
+});
+
+// ── ABOUT PHOTO FLOAT PARALLAX ───────────────────
+const bioPhoto = document.querySelector('.bio-photo');
+let photoTicking = false;
+if (bioPhoto && !isMobile) {
+   window.addEventListener('scroll', () => {
+      if (photoTicking) return;
+      requestAnimationFrame(() => {
+         const rect = bioPhoto.getBoundingClientRect();
+         const center = rect.top + rect.height / 2;
+         const viewCenter = window.innerHeight / 2;
+         const offset = (center - viewCenter) * 0.06;
+         bioPhoto.style.transform = `translateY(${offset}px)`;
+         photoTicking = false;
+      });
+      photoTicking = true;
+   }, { passive: true });
+}
+
+// ── HEADER SMART HIDE/SHOW ───────────────────────
+const headerEl = document.querySelector('header');
+let lastScrollY = 0, headerHidden = false;
+window.addEventListener('scroll', () => {
+   const sy = window.scrollY;
+   const delta = sy - lastScrollY;
+   if (sy > 120 && delta > 8 && !headerHidden) {
+      headerEl.classList.add('hdr-hidden');
+      headerHidden = true;
+   } else if (delta < -5 && headerHidden) {
+      headerEl.classList.remove('hdr-hidden');
+      headerHidden = false;
+   }
+   if (sy > 10) headerEl.classList.add('hdr-shadow');
+   else headerEl.classList.remove('hdr-shadow');
+   lastScrollY = sy;
+}, { passive: true });
+
+// ── FOOTER REVEAL ────────────────────────────────
+const footerEl = document.querySelector('footer');
+if (footerEl) {
+   const footObs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+         entry.target.classList.add('visible');
+         footObs.disconnect();
+      }
+   }, { threshold: 0.2 });
+   footObs.observe(footerEl);
+}
+
+// ── SCROLL-DRIVEN BADGE SCALE ────────────────────
+if (!isMobile) {
+   window.addEventListener('scroll', () => {
+      const sy = window.scrollY;
+      heroBadges.forEach((b, i) => {
+         const scale = Math.max(0.85, 1 - sy * 0.0006 * ((i % 3) * 0.3 + 1));
+         const rotate = Math.sin(sy * 0.003 + i) * 1.5;
+         if (b.classList.contains('anim-in')) {
+            b.style.transform = `scale(${scale.toFixed(3)}) rotate(${rotate.toFixed(2)}deg)`;
+         }
+      });
+   }, { passive: true });
+}
