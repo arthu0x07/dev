@@ -103,8 +103,13 @@ header {
 .hero {
   display: flex; align-items: center; justify-content: center;
   min-height: 58vh; padding: clamp(32px,8vh,90px) var(--pad);
+  position: relative; overflow: hidden;
 }
-.hero-inner { text-align: center; will-change: transform; transition: opacity .2s ease; }
+#hero-3d {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+.hero-inner { text-align: center; will-change: transform; transition: opacity .2s ease; position: relative; z-index: 1; }
 .hero-title {
   font-family: 'DotGothic16', monospace;
   font-size: clamp(24px, 4.8vw, 50px); line-height: 1.3;

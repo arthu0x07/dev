@@ -25,7 +25,7 @@ class P {
       this.x += this.vx; this.y += this.vy;
       const dx = this.x - mouse.x, dy = this.y - mouse.y;
       const d2 = dx * dx + dy * dy;
-      if (d2 < 7744) { // 88*88
+      if (d2 < 7744) {
          const d = Math.sqrt(d2);
          const f = (88 - d) / 88 * .65;
          this.x += dx / d * f * 2.2; this.y += dy / d * f * 2.2;
@@ -46,7 +46,10 @@ const pts = Array.from({ length: ptsCount }, () => new P());
 const lineDistSq = 115 * 115;
 const mouseDistSq = 150 * 150;
 
-function loop() {
+// pause particles when tab is hidden
+let particlesRunning = true;
+function particleLoop() {
+   if (!particlesRunning) return;
    ctx.clearRect(0, 0, W, H);
    for (let i = 0; i < pts.length; i++) {
       const p1 = pts[i];
@@ -69,63 +72,214 @@ function loop() {
          ctx.strokeStyle = `rgba(0,0,0,${(1 - md / 150) * .28})`; ctx.lineWidth = .7; ctx.stroke();
       }
    }
-   requestAnimationFrame(loop);
+   requestAnimationFrame(particleLoop);
 }
-loop();
+particleLoop();
+
+document.addEventListener('visibilitychange', () => {
+   if (document.hidden) { particlesRunning = false; }
+   else { particlesRunning = true; particleLoop(); }
+});
 
 // ── CURSOR ──────────────────────────────────────
-const cur = document.getElementById('cursor'), ring = document.getElementById('cursor-ring');
-let mx = 0, my = 0, rx = 0, ry = 0;
-document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.cssText = `left:${mx}px;top:${my}px`; });
-(function ar() { rx += (mx - rx) * .12; ry += (my - ry) * .12; ring.style.cssText = `left:${rx}px;top:${ry}px`; requestAnimationFrame(ar); })();
+if (!isMobile) {
+   const cur = document.getElementById('cursor'), ring = document.getElementById('cursor-ring');
+   let mx = 0, my = 0, rx = 0, ry = 0, cursorIdle = 0;
+   document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+      cursorIdle = 0;
+   });
+   (function ar() {
+      rx += (mx - rx) * .12; ry += (my - ry) * .12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      cursorIdle++;
+      if (cursorIdle < 120) requestAnimationFrame(ar);
+      else { ring.style.left = mx + 'px'; ring.style.top = my + 'px'; }
+   })();
+   document.addEventListener('mousemove', () => {
+      if (cursorIdle >= 120) { cursorIdle = 0; (function ar() { rx += (mx - rx) * .12; ry += (my - ry) * .12; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; cursorIdle++; if (cursorIdle < 120) requestAnimationFrame(ar); })(); }
+   });
+}
 
-// ── PROGRESS ────────────────────────────────────
+// ── SINGLE SCROLL HANDLER ───────────────────────
 const bar = document.getElementById('progress-bar');
-let ticking = false;
+const heroInner = document.querySelector('.hero-inner');
+const casesSection = document.getElementById('cases');
+const caseCards = document.querySelectorAll('.case-card');
+const headerEl = document.querySelector('header');
+const bioPhoto = document.querySelector('.bio-photo');
+const heroBadges = document.querySelectorAll('.hero-badge');
+
+let prevSY = 0, lastScrollY2 = 0, headerHidden = false, scrollTicking = false;
+
 window.addEventListener('scroll', () => {
-   if (!ticking) {
-      requestAnimationFrame(() => {
-         bar.style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
-         ticking = false;
+   if (scrollTicking) return;
+   requestAnimationFrame(() => {
+      const sy = window.scrollY;
+      const docH = document.body.scrollHeight - window.innerHeight;
+
+      // progress bar
+      bar.style.width = (sy / docH * 100) + '%';
+
+      // hero parallax + fade
+      if (heroInner) {
+         heroInner.style.transform = `translateY(${sy * 0.32}px)`;
+         heroInner.style.opacity = Math.max(0, 1 - sy / 400).toFixed(3);
+      }
+
+      // header hide/show
+      const delta = sy - lastScrollY2;
+      if (sy > 120 && delta > 8 && !headerHidden) {
+         headerEl.classList.add('hdr-hidden'); headerHidden = true;
+      } else if (delta < -5 && headerHidden) {
+         headerEl.classList.remove('hdr-hidden'); headerHidden = false;
+      }
+      if (sy > 10) headerEl.classList.add('hdr-shadow');
+      else headerEl.classList.remove('hdr-shadow');
+      lastScrollY2 = sy;
+
+      // case cards parallax depth
+      if (casesSection) {
+         const rect = casesSection.getBoundingClientRect();
+         const progress = 1 - (rect.top / window.innerHeight);
+         if (progress >= 0 && progress <= 2.2) {
+            const offsets = [18, -12, 14, -10];
+            caseCards.forEach((c, i) => {
+               if (!c.matches(':hover')) {
+                  c.style.transform = `translateY(${offsets[i % offsets.length] * (1 - Math.min(progress, 1))}px)`;
+               }
+            });
+         }
+      }
+
+      // section bar skew on velocity
+      const vel = sy - prevSY;
+      prevSY = sy;
+      document.querySelectorAll('.section-bar.visible').forEach(b => {
+         b.style.transform = `scaleY(1) skewY(${Math.max(-4, Math.min(4, vel * 0.15))}deg)`;
+         clearTimeout(b._tiltTimer);
+         b._tiltTimer = setTimeout(() => { b.style.transform = 'scaleY(1)'; }, 180);
       });
-      ticking = true;
-   }
+
+      // about photo parallax
+      if (bioPhoto && !isMobile) {
+         const rect = bioPhoto.getBoundingClientRect();
+         const center = rect.top + rect.height / 2;
+         const offset = (center - window.innerHeight / 2) * 0.06;
+         bioPhoto.style.transform = `translateY(${offset}px)`;
+      }
+
+      scrollTicking = false;
+   });
+   scrollTicking = true;
 }, { passive: true });
 
-// ── REVEAL ──────────────────────────────────────
-const obs = new IntersectionObserver(entries => {
+// ── UNIFIED INTERSECTION OBSERVER ───────────────
+const revealObs = new IntersectionObserver(entries => {
    entries.forEach(e => {
-      if (e.isIntersecting) {
-         e.target.classList.add('visible');
-         obs.unobserve(e.target);
-      }
-   });
-}, { threshold: .1 });
-document.querySelectorAll('.reveal,.stagger,.reveal-blur,.reveal-scale,.reveal-left,.reveal-right,.reveal-rotate,.reveal-clip,.reveal-pop,.section-divider').forEach(el => obs.observe(el));
+      if (!e.isIntersecting) return;
+      const el = e.target;
 
-// section bars
-const barObs = new IntersectionObserver(entries => {
-   entries.forEach(e => {
-      if (e.isIntersecting) {
-         e.target.classList.add('visible');
-         barObs.unobserve(e.target);
+      // section bar
+      if (el.classList.contains('section-bar')) {
+         el.classList.add('visible');
+         revealObs.unobserve(el);
+         return;
       }
-   });
-}, { threshold: .5 });
-document.querySelectorAll('.section-bar').forEach(el => barObs.observe(el));
 
-// timeline items (staggered)
-const tlObs = new IntersectionObserver(entries => {
-   entries.forEach(e => {
-      if (e.isIntersecting) {
-         e.target.classList.add('visible');
-         tlObs.unobserve(e.target);
+      // timeline items
+      if (el.classList.contains('tl-item')) {
+         el.classList.add('visible');
+         revealObs.unobserve(el);
+         return;
       }
+
+      // skills cascade
+      if (el.classList.contains('skills-row')) {
+         el.querySelectorAll('.skill-pill').forEach((p, i) => {
+            setTimeout(() => p.classList.add('anim-in'), i * 50);
+         });
+         revealObs.unobserve(el);
+         return;
+      }
+
+      // timeline line draw
+      if (el.classList.contains('timeline')) {
+         el.classList.add('line-drawn');
+         revealObs.unobserve(el);
+         return;
+      }
+
+      // hero badges
+      if (el.classList.contains('hero-badges')) {
+         heroBadges.forEach((b, i) => {
+            setTimeout(() => b.classList.add('anim-in'), 200 + i * 120);
+         });
+         revealObs.unobserve(el);
+         return;
+      }
+
+      // case cards grid
+      if (el.classList.contains('cases-grid')) {
+         el.querySelectorAll('.case-card').forEach((c, i) => {
+            setTimeout(() => c.classList.add('card-visible'), i * 180);
+         });
+         revealObs.unobserve(el);
+         return;
+      }
+
+      // section head scramble
+      if (el.classList.contains('section-head')) {
+         const h2 = el.querySelector('h2');
+         if (h2 && !h2.dataset.scrambled) {
+            h2.dataset.scrambled = '1';
+            new TextScramble(h2).setText(h2.textContent.trim());
+         }
+         revealObs.unobserve(el);
+         return;
+      }
+
+      // footer
+      if (el.tagName === 'FOOTER') {
+         el.classList.add('visible');
+         revealObs.unobserve(el);
+         return;
+      }
+
+      // counter
+      if (el.dataset.count) {
+         countUp(el, +el.dataset.count, 900);
+         revealObs.unobserve(el);
+         return;
+      }
+
+      // default reveal
+      el.classList.add('visible');
+      revealObs.unobserve(el);
    });
-}, { threshold: .12 });
+}, { threshold: 0.1 });
+
+// register all elements
+document.querySelectorAll(
+   '.reveal,.stagger,.reveal-blur,.reveal-scale,.reveal-left,.reveal-right,.reveal-rotate,.reveal-clip,.reveal-pop,.section-divider,' +
+   '.section-bar,.tl-item,.skills-row,.timeline,.hero-badges,.cases-grid,.section-head,[data-count],footer'
+).forEach((el, i) => {
+   // stagger delays for timeline items
+   if (el.classList.contains('tl-item')) el.style.transitionDelay = `${i * 0.08}s`;
+   revealObs.observe(el);
+});
+
+// fix tl-item delay (re-index properly)
 document.querySelectorAll('.tl-item').forEach((el, i) => {
    el.style.transitionDelay = `${i * 0.08}s`;
-   tlObs.observe(el);
+});
+
+// timeline tags stagger
+document.querySelectorAll('.tl-item').forEach(item => {
+   item.querySelectorAll('.tl-tag').forEach((tag, i) => {
+      tag.style.transitionDelay = `${0.3 + i * 0.06}s`;
+   });
 });
 
 // ── ACTIVE NAV ──────────────────────────────────
@@ -193,13 +347,13 @@ function type() {
 setTimeout(type, 2600);
 
 // ── CARD TILT ───────────────────────────────────
-function tilt(sel, s) {
-   document.querySelectorAll(sel).forEach(el => {
+if (!isMobile) {
+   document.querySelectorAll('.case-card').forEach(el => {
       el.addEventListener('mousemove', e => {
          const r = el.getBoundingClientRect();
          const x = (e.clientX - r.left) / r.width - .5;
          const y = (e.clientY - r.top) / r.height - .5;
-         el.style.transform = `translateY(-7px) rotateY(${x * s * 2}deg) rotateX(${-y * s * 2}deg)`;
+         el.style.transform = `translateY(-7px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
          el.style.transition = 'transform .05s';
       });
       el.addEventListener('mouseleave', () => {
@@ -207,85 +361,6 @@ function tilt(sel, s) {
       });
    });
 }
-tilt('.case-card', 4);
-
-// ── HERO PARALLAX + FADE ────────────────────────
-const heroInner = document.querySelector('.hero-inner');
-let heroTicking = false;
-window.addEventListener('scroll', () => {
-   if (!heroInner || heroTicking) return;
-   requestAnimationFrame(() => {
-      const sy = window.scrollY;
-      heroInner.style.transform = `translateY(${sy * 0.32}px)`;
-      heroInner.style.opacity = Math.max(0, 1 - sy / 400).toFixed(3);
-      heroTicking = false;
-   });
-   heroTicking = true;
-}, { passive: true });
-
-// ── TIMELINE LINE DRAW ───────────────────────────
-const lineObs = new IntersectionObserver(entries => {
-   entries.forEach(e => {
-      if (e.isIntersecting) {
-         e.target.classList.add('line-drawn');
-         lineObs.unobserve(e.target);
-      }
-   });
-}, { threshold: 0.05 });
-document.querySelectorAll('.timeline').forEach(el => lineObs.observe(el));
-
-// ── SKILLS CASCADE ───────────────────────────────
-const skillsObs = new IntersectionObserver(entries => {
-   entries.forEach(e => {
-      if (e.isIntersecting) {
-         e.target.querySelectorAll('.skill-pill').forEach((p, i) => {
-            setTimeout(() => p.classList.add('anim-in'), i * 50);
-         });
-         skillsObs.unobserve(e.target);
-      }
-   });
-}, { threshold: 0.15 });
-document.querySelectorAll('.skills-row').forEach(el => skillsObs.observe(el));
-
-// ── CASE CARDS PARALLAX DEPTH ────────────────────
-const casesSection = document.getElementById('cases');
-const caseCards = document.querySelectorAll('.case-card');
-let casesTicking = false;
-window.addEventListener('scroll', () => {
-   if (!casesSection || casesTicking) return;
-   requestAnimationFrame(() => {
-      const rect = casesSection.getBoundingClientRect();
-      const progress = 1 - (rect.top / window.innerHeight);
-      if (progress >= 0 && progress <= 2.2) {
-         const offsets = [18, -12, 14, -10];
-         caseCards.forEach((c, i) => {
-            if (!c.matches(':hover')) {
-               c.style.transform = `translateY(${offsets[i % offsets.length] * (1 - Math.min(progress, 1))}px)`;
-            }
-         });
-      }
-      casesTicking = false;
-   });
-   casesTicking = true;
-}, { passive: true });
-
-// ── SCROLL SPEED TILT ON SECTION BARS ────────────
-let prevSY = 0;
-let barsTicking = false;
-window.addEventListener('scroll', () => {
-   if (barsTicking) return;
-   requestAnimationFrame(() => {
-      const vel = window.scrollY - prevSY;
-      prevSY = window.scrollY;
-      document.querySelectorAll('.section-bar.visible').forEach(bar => {
-         bar.style.transform = `scaleY(1) skewY(${Math.max(-4, Math.min(4, vel * 0.15))}deg)`;
-         clearTimeout(bar._tiltTimer);
-         bar._tiltTimer = setTimeout(() => { bar.style.transform = 'scaleY(1)'; }, 180);
-      });
-      barsTicking = false;
-   });
-   barsTicking = true;
-}, { passive: true });
 
 // ── TEXT SCRAMBLE ────────────────────────────────
 class TextScramble {
@@ -334,43 +409,42 @@ class TextScramble {
       }
    }
 }
-const scrambleObs = new IntersectionObserver(entries => {
-   entries.forEach(e => {
-      if (e.isIntersecting) {
-         const h2 = e.target.querySelector('h2');
-         if (h2 && !h2.dataset.scrambled) {
-            h2.dataset.scrambled = '1';
-            const text = h2.textContent.trim();
-            new TextScramble(h2).setText(text);
-         }
-         scrambleObs.unobserve(e.target);
-      }
-   });
-}, { threshold: 0.4 });
-document.querySelectorAll('.section-head').forEach(el => scrambleObs.observe(el));
 
-// ── MAGNETIC EFFECT ───────────────────────────────
-document.querySelectorAll('.magnetic').forEach(el => {
-   let cx = 0, cy = 0, tx = 0, ty = 0, raf;
-   const lerp = () => {
-      cx += (tx - cx) * 0.13;
-      cy += (ty - cy) * 0.13;
-      el.style.transform = `translate(${cx.toFixed(2)}px, ${cy.toFixed(2)}px)`;
-      if (Math.abs(tx - cx) > 0.05 || Math.abs(ty - cy) > 0.05) raf = requestAnimationFrame(lerp);
+// ── COUNTER ─────────────────────────────────────
+function countUp(el, target, duration) {
+   let start = 0, step = target / (duration / 16);
+   const tick = () => {
+      start = Math.min(start + step, target);
+      el.textContent = Math.floor(start) + (start >= target ? el.dataset.suffix || '' : '');
+      if (start < target) requestAnimationFrame(tick);
    };
-   el.addEventListener('mousemove', e => {
-      const r = el.getBoundingClientRect();
-      tx = (e.clientX - (r.left + r.width / 2)) * 0.38;
-      ty = (e.clientY - (r.top + r.height / 2)) * 0.38;
-      cancelAnimationFrame(raf); raf = requestAnimationFrame(lerp);
-   });
-   el.addEventListener('mouseleave', () => {
-      tx = 0; ty = 0;
-      cancelAnimationFrame(raf); raf = requestAnimationFrame(lerp);
-   });
-});
+   requestAnimationFrame(tick);
+}
 
-// ── WORD REVEAL ───────────────────────────────────
+// ── MAGNETIC EFFECT ──────────────────────────────
+if (!isMobile) {
+   document.querySelectorAll('.magnetic').forEach(el => {
+      let cx = 0, cy = 0, tx = 0, ty = 0, raf;
+      const lerp = () => {
+         cx += (tx - cx) * 0.13;
+         cy += (ty - cy) * 0.13;
+         el.style.transform = `translate(${cx.toFixed(2)}px, ${cy.toFixed(2)}px)`;
+         if (Math.abs(tx - cx) > 0.05 || Math.abs(ty - cy) > 0.05) raf = requestAnimationFrame(lerp);
+      };
+      el.addEventListener('mousemove', e => {
+         const r = el.getBoundingClientRect();
+         tx = (e.clientX - (r.left + r.width / 2)) * 0.38;
+         ty = (e.clientY - (r.top + r.height / 2)) * 0.38;
+         cancelAnimationFrame(raf); raf = requestAnimationFrame(lerp);
+      });
+      el.addEventListener('mouseleave', () => {
+         tx = 0; ty = 0;
+         cancelAnimationFrame(raf); raf = requestAnimationFrame(lerp);
+      });
+   });
+}
+
+// ── WORD REVEAL ──────────────────────────────────
 document.querySelectorAll('.reveal-words').forEach(el => {
    el.innerHTML = el.textContent.trim().split(' ').map(w =>
       `<span class="word-wrap"><span class="word">${w}</span></span>`
@@ -385,131 +459,16 @@ document.querySelectorAll('.reveal-words').forEach(el => {
    wObs.observe(el);
 });
 
-// ── CARD GLARE ────────────────────────────────────
-document.querySelectorAll('.case-card').forEach(card => {
-   const glare = document.createElement('div');
-   glare.className = 'card-glare';
-   card.appendChild(glare);
-   card.addEventListener('mousemove', e => {
-      const r = card.getBoundingClientRect();
-      card.style.setProperty('--gx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
-      card.style.setProperty('--gy', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
-   });
-});
-
-// ── COUNTER ANIMATION ────────────────────────────
-function countUp(el, target, duration) {
-   let start = 0, step = target / (duration / 16);
-   const tick = () => {
-      start = Math.min(start + step, target);
-      el.textContent = Math.floor(start) + (start >= target ? el.dataset.suffix || '' : '');
-      if (start < target) requestAnimationFrame(tick);
-   };
-   requestAnimationFrame(tick);
-}
-const counterObs = new IntersectionObserver(entries => {
-   entries.forEach(e => {
-      if (e.isIntersecting) {
-         countUp(e.target, +e.target.dataset.count, 900);
-         counterObs.unobserve(e.target);
-      }
-   });
-}, { threshold: 0.5 });
-document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
-
-// ── HERO BADGES CASCADE ─────────────────────────
-const heroBadges = document.querySelectorAll('.hero-badge');
-const badgesObs = new IntersectionObserver(([entry]) => {
-   if (entry.isIntersecting) {
-      heroBadges.forEach((b, i) => {
-         setTimeout(() => b.classList.add('anim-in'), 200 + i * 120);
-      });
-      badgesObs.disconnect();
-   }
-}, { threshold: 0.3 });
-const badgesWrap = document.querySelector('.hero-badges');
-if (badgesWrap) badgesObs.observe(badgesWrap);
-
-// ── CASE CARDS 3D SEQUENTIAL REVEAL ──────────────
-const cardRevealObs = new IntersectionObserver(entries => {
-   entries.forEach(e => {
-      if (e.isIntersecting) {
-         const cards = e.target.querySelectorAll('.case-card');
-         cards.forEach((c, i) => {
-            setTimeout(() => c.classList.add('card-visible'), i * 180);
-         });
-         cardRevealObs.unobserve(e.target);
-      }
-   });
-}, { threshold: 0.08 });
-const casesGrid = document.querySelector('.cases-grid');
-if (casesGrid) cardRevealObs.observe(casesGrid);
-
-// ── TIMELINE TAGS STAGGER ────────────────────────
-document.querySelectorAll('.tl-item').forEach(item => {
-   item.querySelectorAll('.tl-tag').forEach((tag, i) => {
-      tag.style.transitionDelay = `${0.3 + i * 0.06}s`;
-   });
-});
-
-// ── ABOUT PHOTO FLOAT PARALLAX ───────────────────
-const bioPhoto = document.querySelector('.bio-photo');
-let photoTicking = false;
-if (bioPhoto && !isMobile) {
-   window.addEventListener('scroll', () => {
-      if (photoTicking) return;
-      requestAnimationFrame(() => {
-         const rect = bioPhoto.getBoundingClientRect();
-         const center = rect.top + rect.height / 2;
-         const viewCenter = window.innerHeight / 2;
-         const offset = (center - viewCenter) * 0.06;
-         bioPhoto.style.transform = `translateY(${offset}px)`;
-         photoTicking = false;
-      });
-      photoTicking = true;
-   }, { passive: true });
-}
-
-// ── HEADER SMART HIDE/SHOW ───────────────────────
-const headerEl = document.querySelector('header');
-let lastScrollY = 0, headerHidden = false;
-window.addEventListener('scroll', () => {
-   const sy = window.scrollY;
-   const delta = sy - lastScrollY;
-   if (sy > 120 && delta > 8 && !headerHidden) {
-      headerEl.classList.add('hdr-hidden');
-      headerHidden = true;
-   } else if (delta < -5 && headerHidden) {
-      headerEl.classList.remove('hdr-hidden');
-      headerHidden = false;
-   }
-   if (sy > 10) headerEl.classList.add('hdr-shadow');
-   else headerEl.classList.remove('hdr-shadow');
-   lastScrollY = sy;
-}, { passive: true });
-
-// ── FOOTER REVEAL ────────────────────────────────
-const footerEl = document.querySelector('footer');
-if (footerEl) {
-   const footObs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-         entry.target.classList.add('visible');
-         footObs.disconnect();
-      }
-   }, { threshold: 0.2 });
-   footObs.observe(footerEl);
-}
-
-// ── SCROLL-DRIVEN BADGE SCALE ────────────────────
+// ── CARD GLARE ───────────────────────────────────
 if (!isMobile) {
-   window.addEventListener('scroll', () => {
-      const sy = window.scrollY;
-      heroBadges.forEach((b, i) => {
-         const scale = Math.max(0.85, 1 - sy * 0.0006 * ((i % 3) * 0.3 + 1));
-         const rotate = Math.sin(sy * 0.003 + i) * 1.5;
-         if (b.classList.contains('anim-in')) {
-            b.style.transform = `scale(${scale.toFixed(3)}) rotate(${rotate.toFixed(2)}deg)`;
-         }
+   document.querySelectorAll('.case-card').forEach(card => {
+      const glare = document.createElement('div');
+      glare.className = 'card-glare';
+      card.appendChild(glare);
+      card.addEventListener('mousemove', e => {
+         const r = card.getBoundingClientRect();
+         card.style.setProperty('--gx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+         card.style.setProperty('--gy', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
       });
-   }, { passive: true });
+   });
 }
