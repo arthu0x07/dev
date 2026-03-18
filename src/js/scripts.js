@@ -312,7 +312,7 @@ navTab.addEventListener('click', () => {
 });
 
 // ── TYPING ──────────────────────────────────────
-const roles = [
+let roles = [
    'front-end.web(developer)',
    'back-end.api(engineer)',
    'full-stack.dev(builder)',
@@ -635,3 +635,185 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
    });
    svg.innerHTML = html;
 })();
+
+// ── i18n TRANSLATION SYSTEM ─────────────────────
+const i18n = {
+   en: {
+      'nav.home': 'home', 'nav.cases': 'cases', 'nav.work': 'work', 'nav.about': 'about', 'nav.contact': 'contact',
+      'header.service': 'freelance service', 'header.status': 'open to work',
+      'hero.sub': 'Full-Stack Engineer · 4+ years · Rio de Janeiro → worldwide',
+      'strip.label': 'Trusted by',
+      'cases.title': 'clients & cases', 'cases.kicker': 'Selected work', 'cases.cta': 'View details →',
+      'cases.sirio.title': 'Electronic Medical Record', 'cases.sirio.period': '2022–2024 · São Paulo (Remote)',
+      'cases.eumedico.title': 'Medical Residency Platform', 'cases.eumedico.period': '2024–2025 · Recife (Remote)',
+      'cases.zig.title': 'Table Management & Payments', 'cases.zig.period': '2025–present · Remote',
+      'stats.years': 'Years of experience', 'stats.companies': 'Companies', 'stats.industries': 'Industries', 'stats.techs': 'Technologies',
+      'exp.title': 'work experience',
+      'about.title': 'about me', 'about.headline': 'Software Engineer · Full-Stack Developer',
+      'about.desc': "Full-stack developer with 4+ years of professional experience shipping real products across healthtech, greentech and fintech. I'm obsessive about clean code, intuitive interfaces and performance — from robust NestJS APIs to pixel-perfect React UIs. Based in Rio de Janeiro, working remotely with teams worldwide.",
+      'about.award_html': '<strong>Guardião da Performance</strong> — recognised by 1STi in Sep 2023 for excellence, consistency and technical mastery across projects.',
+      'contact.heading': "Let's build something great.",
+      'contact.sub': 'Open to freelance, full-time roles and interesting collabs.',
+      'contact.btn': 'Send a message',
+      'footer.copy_html': 'coding by <strong>me</strong> · Rio de Janeiro · 2026',
+   },
+   pt: {
+      'nav.home': 'início', 'nav.cases': 'cases', 'nav.work': 'experiência', 'nav.about': 'sobre', 'nav.contact': 'contato',
+      'header.service': 'freelance', 'header.status': 'disponível',
+      'hero.sub': 'Engenheiro Full-Stack · 4+ anos · Rio de Janeiro → mundo',
+      'strip.label': 'Empresas',
+      'cases.title': 'clientes & cases', 'cases.kicker': 'Trabalhos selecionados', 'cases.cta': 'Ver detalhes →',
+      'cases.sirio.title': 'Prontuário Eletrônico', 'cases.sirio.period': '2022–2024 · São Paulo (Remoto)',
+      'cases.eumedico.title': 'Plataforma de Residência Médica', 'cases.eumedico.period': '2024–2025 · Recife (Remoto)',
+      'cases.zig.title': 'Gestão de Mesas & Pagamentos', 'cases.zig.period': '2025–atual · Remoto',
+      'stats.years': 'Anos de experiência', 'stats.companies': 'Empresas', 'stats.industries': 'Indústrias', 'stats.techs': 'Tecnologias',
+      'exp.title': 'experiência profissional',
+      'about.title': 'sobre mim', 'about.headline': 'Engenheiro de Software · Desenvolvedor Full-Stack',
+      'about.desc': 'Desenvolvedor full-stack com 4+ anos de experiência profissional entregando produtos reais em healthtech, greentech e fintech. Sou obcecado por código limpo, interfaces intuitivas e performance — de APIs robustas com NestJS a interfaces pixel-perfect com React. Baseado no Rio de Janeiro, trabalhando remotamente com equipes do mundo todo.',
+      'about.award_html': '<strong>Guardião da Performance</strong> — reconhecido pela 1STi em Set 2023 por excelência, consistência e domínio técnico em projetos.',
+      'contact.heading': 'Vamos construir algo incrível.',
+      'contact.sub': 'Aberto a freelance, vagas CLT e colaborações interessantes.',
+      'contact.btn': 'Enviar mensagem',
+      'footer.copy_html': 'feito por <strong>mim</strong> · Rio de Janeiro · 2026',
+   }
+};
+
+const modalDataPt = {
+   moss: {
+      tag: 'GreenTech · Fintech',
+      title: 'Moss.Earth — Plataforma de Crédito de Carbono',
+      period: 'Jan 2021 – Nov 2021 · Montevidéu, UY (Remoto)',
+      body: `<h3>O Desafio</h3>
+<p>Construir uma plataforma B2B para negociação de créditos de carbono e controle de tokens, melhorando a transparência em transações ambientais.</p>
+<h3>O que Construí</h3>
+<ul>
+<li>Ferramenta avançada de cálculo de área integrando mapas em tempo real e dados governamentais</li>
+<li>Otimização dos fluxos de análise de preservação amazônica</li>
+<li>Dashboards interativos para rastreamento de créditos de carbono</li>
+</ul>
+<h3>Impacto</h3>
+<p>Reduziu significativamente o tempo de trabalho de campo para análise de preservação — permitindo decisões mais rápidas para projetos ambientais.</p>`,
+      stack: modalData.moss.stack
+   },
+   sirio: {
+      tag: 'HealthTech · Enterprise',
+      title: 'Hospital Sírio-Libanês — Prontuário Eletrônico',
+      period: 'Jan 2022 – Jun 2024 · São Paulo (Remoto)',
+      body: `<h3>O Desafio</h3>
+<p>Construir uma plataforma web complexa permitindo que médicos agendem exames, prescrevam medicamentos e marquem cirurgias em um dos maiores hospitais do Brasil.</p>
+<h3>O que Construí</h3>
+<ul>
+<li>Plataforma web completa de prontuário eletrônico</li>
+<li>Versão mobile usando React Native</li>
+<li>Ferramenta de transcrição de voz com IA para documentação cirúrgica</li>
+<li>Iniciei com portal universitário (Cruzeiro do Sul) usando React + Gatsby</li>
+</ul>
+<h3>Impacto</h3>
+<p>Digitalizou fluxos médicos críticos para um hospital de referência, melhorando a eficiência dos médicos e a precisão dos registros.</p>`,
+      stack: modalData.sirio.stack
+   },
+   eumedico: {
+      tag: 'HealthTech · SaaS',
+      title: 'Eu Médico Residente — Plataforma de Residência Médica',
+      period: 'Jun 2024 – Out 2025 · Recife (Remoto)',
+      body: `<h3>O Desafio</h3>
+<p>Construir e escalar uma plataforma SaaS para preparação de residência médica, lidando com lógica server-side complexa e múltiplas aplicações.</p>
+<h3>O que Construí</h3>
+<ul>
+<li>Lógica server-side com NestJS + Clean Architecture</li>
+<li>Integrações de API e UIs otimizadas em web e mobile</li>
+<li>Suítes de testes automatizados garantindo qualidade e segurança</li>
+<li>Suporte à equipe através de code reviews e pair programming</li>
+</ul>
+<h3>Impacto</h3>
+<p>Aplicou conceitos de Clean Architecture em múltiplos projetos, melhorando a manutenibilidade e velocidade da equipe.</p>`,
+      stack: modalData.eumedico.stack
+   },
+   zig: {
+      tag: 'Fintech · Pagamentos',
+      title: 'Zig / Cubos — Gestão de Mesas & Pagamentos',
+      period: 'Jun 2025 – atual · Remoto',
+      body: `<h3>O Desafio</h3>
+<p>Desenvolver e manter um sistema de gestão de mesas usado em grandes eventos e estabelecimentos, processando pagamentos em tempo real em escala.</p>
+<h3>O que Construí</h3>
+<ul>
+<li>Sessões de pagamento em tempo real e fluxos de divisão de conta</li>
+<li>Integração com gateway de pagamento e processamento offline-first</li>
+<li>Monitoramento e resolução de incidentes em produção</li>
+<li>Mentoria de novos membros da equipe através de code reviews</li>
+</ul>
+<h3>Impacto</h3>
+<p>Garantiu operações sem conectividade através de arquitetura offline-first, crítico para grandes eventos com redes instáveis.</p>`,
+      stack: modalData.zig.stack
+   }
+};
+
+const rolesEn = [
+   'front-end.web(developer)',
+   'back-end.api(engineer)',
+   'full-stack.dev(builder)',
+   'mobile.app(developer)',
+];
+const rolesPt = [
+   'front-end.web(desenvolvedor)',
+   'back-end.api(engenheiro)',
+   'full-stack.dev(construtor)',
+   'mobile.app(desenvolvedor)',
+];
+
+let currentLang = localStorage.getItem('lang') || 'en';
+const langToggle = document.getElementById('lang-toggle');
+const langLabel = langToggle.querySelector('.lang-label');
+
+function applyLang(lang) {
+   currentLang = lang;
+   const t = i18n[lang];
+   document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (!t[key]) return;
+      if (key.endsWith('_html')) {
+         el.innerHTML = t[key];
+      } else {
+         // for reveal-words, rebuild word wraps
+         if (el.classList.contains('reveal-words')) {
+            el.innerHTML = t[key].split(' ').map(w =>
+               `<span class="word-wrap"><span class="word in">${w}</span></span>`
+            ).join(' ');
+         } else {
+            el.textContent = t[key];
+         }
+      }
+   });
+   // update lang label (show opposite)
+   langLabel.textContent = lang === 'en' ? 'PT' : 'EN';
+   // update html lang
+   document.documentElement.lang = lang === 'en' ? 'en' : 'pt-BR';
+   // swap typing roles
+   roles.length = 0;
+   roles.push(...(lang === 'en' ? rolesEn : rolesPt));
+   localStorage.setItem('lang', lang);
+}
+
+langToggle.addEventListener('click', () => {
+   applyLang(currentLang === 'en' ? 'pt' : 'en');
+});
+
+// apply saved lang on load
+applyLang(currentLang);
+
+// override modal open to use current lang
+const origModalCards = document.querySelectorAll('.case-card[data-modal]');
+origModalCards.forEach(card => {
+   card.addEventListener('click', () => {
+      const key = card.dataset.modal;
+      const d = currentLang === 'pt' ? modalDataPt[key] : modalData[key];
+      if (!d) return;
+      document.getElementById('modal-tag').textContent = d.tag;
+      document.getElementById('modal-title').textContent = d.title;
+      document.getElementById('modal-period').textContent = d.period;
+      document.getElementById('modal-body').innerHTML = d.body;
+      document.getElementById('modal-stack').innerHTML = d.stack.map(s => `<span>${s}</span>`).join('');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+   });
+});

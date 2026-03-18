@@ -43,12 +43,12 @@
 
 <!-- SIDE NAV -->
 <nav class="side-nav" id="side-nav">
-  <a href="#inicio" class="active">home</a>
+  <a href="#inicio" class="active" data-i18n="nav.home">home</a>
   <div class="side-nav-sep"></div>
-  <a href="#cases">cases</a>
-  <a href="#experiencia">work</a>
-  <a href="#sobre">about</a>
-  <a href="#contato">contact</a>
+  <a href="#cases" data-i18n="nav.cases">cases</a>
+  <a href="#experiencia" data-i18n="nav.work">work</a>
+  <a href="#sobre" data-i18n="nav.about">about</a>
+  <a href="#contato" data-i18n="nav.contact">contact</a>
 </nav>
 
 <!-- MOBILE TAB -->
@@ -63,9 +63,12 @@
     <div class="logo">arthu0x</div>
     <div class="header-right">
       <div class="header-cta">
-        <div class="service">freelance service</div>
-        <div class="discount">open to work</div>
+        <div class="service" data-i18n="header.service">freelance service</div>
+        <div class="discount" data-i18n="header.status">open to work</div>
       </div>
+      <button class="lang-toggle" id="lang-toggle" aria-label="Toggle language">
+        <span class="lang-label">PT</span>
+      </button>
       <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
         <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
@@ -80,7 +83,7 @@
       <div class="hero-title">
         <span id="typed-text">front-end.web(developer)</span><span class="cursor-blink"></span>
       </div>
-      <p class="hero-sub">Full-Stack Engineer · 4+ years · Rio de Janeiro → worldwide</p>
+      <p class="hero-sub" data-i18n="hero.sub">Full-Stack Engineer · 4+ years · Rio de Janeiro → worldwide</p>
       <div class="hero-badges">
         <span class="hero-badge">React & Next.js</span>
         <span class="hero-badge">Node.js & NestJS</span>
@@ -97,7 +100,7 @@
 
   <!-- ═══ LOGO STRIP ═══ -->
   <div class="logo-strip reveal">
-    <span class="logo-strip-label">Trusted by</span>
+    <span class="logo-strip-label" data-i18n="strip.label">Trusted by</span>
     <div class="logo-strip-track">
       <div class="logo-strip-slide">
         <span class="strip-logo">Moss.Earth</span>
@@ -143,8 +146,8 @@
   <section id="cases">
     <div class="section-head reveal">
       <div class="section-bar"></div>
-      <h2>clients & cases</h2>
-      <span class="section-kicker">Selected work</span>
+      <h2 data-i18n="cases.title">clients & cases</h2>
+      <span class="section-kicker" data-i18n="cases.kicker">Selected work</span>
     </div>
     <div class="cases-grid">
 
@@ -158,7 +161,7 @@
           <div class="case-title">Carbon Credit Platform</div>
           <div class="case-period">2021 · Montevideo, UY (Remote)</div>
         </div>
-        <div class="case-hover-cta">View details →</div>
+        <div class="case-hover-cta" data-i18n="cases.cta">View details →</div>
       </div>
 
       <!-- Hospital Sírio-Libanês -->
@@ -168,10 +171,10 @@
         <div class="case-logo">Sírio-Libanês</div>
         <div class="case-info">
           <div class="case-tag">HealthTech · Enterprise</div>
-          <div class="case-title">Electronic Medical Record</div>
-          <div class="case-period">2022–2024 · São Paulo (Remote)</div>
+          <div class="case-title" data-i18n="cases.sirio.title">Electronic Medical Record</div>
+          <div class="case-period" data-i18n="cases.sirio.period">2022–2024 · São Paulo (Remote)</div>
         </div>
-        <div class="case-hover-cta">View details →</div>
+        <div class="case-hover-cta" data-i18n="cases.cta">View details →</div>
       </div>
 
       <!-- Eu Médico Residente -->
@@ -181,10 +184,10 @@
         <div class="case-logo">Eu Médico</div>
         <div class="case-info">
           <div class="case-tag">HealthTech · SaaS</div>
-          <div class="case-title">Medical Residency Platform</div>
-          <div class="case-period">2024–2025 · Recife (Remote)</div>
+          <div class="case-title" data-i18n="cases.eumedico.title">Medical Residency Platform</div>
+          <div class="case-period" data-i18n="cases.eumedico.period">2024–2025 · Recife (Remote)</div>
         </div>
-        <div class="case-hover-cta">View details →</div>
+        <div class="case-hover-cta" data-i18n="cases.cta">View details →</div>
       </div>
 
       <!-- Zig / Cubos -->
@@ -194,10 +197,10 @@
         <div class="case-logo">Zig · Cubos</div>
         <div class="case-info">
           <div class="case-tag">Fintech · Payments</div>
-          <div class="case-title">Table Management & Payments</div>
-          <div class="case-period">2025–present · Remote</div>
+          <div class="case-title" data-i18n="cases.zig.title">Table Management & Payments</div>
+          <div class="case-period" data-i18n="cases.zig.period">2025–present · Remote</div>
         </div>
-        <div class="case-hover-cta">View details →</div>
+        <div class="case-hover-cta" data-i18n="cases.cta">View details →</div>
       </div>
 
     </div>
@@ -208,19 +211,19 @@
     <div class="stats-grid reveal">
       <div class="stat-card">
         <div class="stat-number" data-count="4" data-suffix="+">0</div>
-        <div class="stat-label">Years of experience</div>
+        <div class="stat-label" data-i18n="stats.years">Years of experience</div>
       </div>
       <div class="stat-card">
         <div class="stat-number" data-count="6" data-suffix="">0</div>
-        <div class="stat-label">Companies</div>
+        <div class="stat-label" data-i18n="stats.companies">Companies</div>
       </div>
       <div class="stat-card">
         <div class="stat-number" data-count="4" data-suffix="">0</div>
-        <div class="stat-label">Industries</div>
+        <div class="stat-label" data-i18n="stats.industries">Industries</div>
       </div>
       <div class="stat-card">
         <div class="stat-number" data-count="18" data-suffix="+">0</div>
-        <div class="stat-label">Technologies</div>
+        <div class="stat-label" data-i18n="stats.techs">Technologies</div>
       </div>
     </div>
   </section>
@@ -231,7 +234,7 @@
   <section id="experiencia">
     <div class="section-head reveal">
       <div class="section-bar"></div>
-      <h2>work experience</h2>
+      <h2 data-i18n="exp.title">work experience</h2>
       <span class="section-kicker"><span data-count="4" data-suffix="+ years">4+ years</span></span>
     </div>
 
@@ -365,7 +368,7 @@
   <section id="sobre">
     <div class="section-head reveal">
       <div class="section-bar"></div>
-      <h2>about me</h2>
+      <h2 data-i18n="about.title">about me</h2>
     </div>
 
     <div class="about-grid">
@@ -377,8 +380,8 @@
       />
       <div class="reveal-right">
         <div class="bio-name">Arthur Silva</div>
-        <div class="bio-headline">Software Engineer · Full-Stack Developer</div>
-        <div class="bio-desc reveal-blur">
+        <div class="bio-headline" data-i18n="about.headline">Software Engineer · Full-Stack Developer</div>
+        <div class="bio-desc reveal-blur" data-i18n="about.desc">
           Full-stack developer with 4+ years of professional experience shipping real products across healthtech, greentech and fintech. I'm obsessive about clean code, intuitive interfaces and performance — from robust NestJS APIs to pixel-perfect React UIs. Based in Rio de Janeiro, working remotely with teams worldwide.
         </div>
         <div class="bio-links">
@@ -416,7 +419,7 @@
         <div class="award-strip reveal-pop">
           <div class="award-icon">🏅</div>
           <div class="award-text">
-            <strong>Guardião da Performance</strong> — recognised by 1STi in Sep 2023 for excellence, consistency and technical mastery across projects.
+            <span data-i18n="about.award_html"><strong>Guardião da Performance</strong> — recognised by 1STi in Sep 2023 for excellence, consistency and technical mastery across projects.</span>
           </div>
         </div>
       </div>
@@ -430,13 +433,13 @@
     <div class="contact-wrap reveal-scale">
       <div class="contact-inner">
         <div class="contact-left reveal-left">
-          <h2 class="reveal-words">Let's build something great.</h2>
-          <p>Open to freelance, full-time roles and interesting collabs.</p>
+          <h2 class="reveal-words" data-i18n="contact.heading">Let's build something great.</h2>
+          <p data-i18n="contact.sub">Open to freelance, full-time roles and interesting collabs.</p>
         </div>
         <div class="contact-actions reveal-right">
           <a href="mailto:arthur@email.com" class="btn-primary magnetic">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            Send a message
+            <span data-i18n="contact.btn">Send a message</span>
           </a>
           <div class="social-row">
             <a href="https://www.linkedin.com/in/arthu0x7/" target="_blank" title="LinkedIn" class="magnetic">
@@ -466,7 +469,7 @@
   <!-- ═══ FOOTER ═══ -->
   <footer>
     <div class="f-logo">arthur0x</div>
-    <div class="f-copy">coding by <strong>me</strong> · Rio de Janeiro · 2026</div>
+    <div class="f-copy" data-i18n="footer.copy_html">coding by <strong>me</strong> · Rio de Janeiro · 2026</div>
   </footer>
 
 </div><!-- .page -->
