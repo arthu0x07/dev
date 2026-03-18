@@ -102,6 +102,14 @@ if (!isMobile) {
    });
 }
 
+// ── NAV ACTIVE HELPER ────────────────────────────
+const navLinks = document.querySelectorAll('.side-nav a');
+function setActiveNav(href) {
+   navLinks.forEach(l => l.classList.remove('active'));
+   const match = document.querySelector(`.side-nav a[href="${href}"]`);
+   if (match) match.classList.add('active');
+}
+
 // ── SINGLE SCROLL HANDLER ───────────────────────
 const bar = document.getElementById('progress-bar');
 const heroInner = document.querySelector('.hero-inner');
@@ -110,8 +118,13 @@ const caseCards = document.querySelectorAll('.case-card');
 const headerEl = document.querySelector('header');
 const bioPhoto = document.querySelector('.bio-photo');
 const heroBadges = document.querySelectorAll('.hero-badge');
+const backToTop = document.getElementById('back-to-top');
 
 let prevSY = 0, lastScrollY2 = 0, headerHidden = false, scrollTicking = false;
+
+backToTop.addEventListener('click', () => {
+   window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
 window.addEventListener('scroll', () => {
    if (scrollTicking) return;
@@ -161,6 +174,13 @@ window.addEventListener('scroll', () => {
          clearTimeout(b._tiltTimer);
          b._tiltTimer = setTimeout(() => { b.style.transform = 'scaleY(1)'; }, 180);
       });
+
+      // back to top
+      if (sy > 600) backToTop.classList.add('visible');
+      else backToTop.classList.remove('visible');
+
+      // set "home" active when near top
+      if (sy < 200) setActiveNav('#inicio');
 
       // about photo parallax
       if (bioPhoto && !isMobile) {
@@ -283,8 +303,7 @@ document.querySelectorAll('.tl-item').forEach(item => {
    });
 });
 
-// ── ACTIVE NAV ──────────────────────────────────
-const navLinks = document.querySelectorAll('.side-nav a');
+// ── ACTIVE NAV (observer) ────────────────────────
 const secObs = new IntersectionObserver(entries => {
    entries.forEach(e => {
       if (e.isIntersecting) {
@@ -293,10 +312,24 @@ const secObs = new IntersectionObserver(entries => {
          if (l) l.classList.add('active');
       }
    });
-}, { rootMargin: '-40% 0px -50% 0px' });
+}, { rootMargin: '-30% 0px -60% 0px' });
 ['inicio', 'cases', 'experiencia', 'sobre', 'contato'].forEach(id => {
    const el = document.getElementById(id);
    if (el) secObs.observe(el);
+});
+
+// fix nav clicks: show header, set active, handle #inicio
+navLinks.forEach(link => {
+   link.addEventListener('click', e => {
+      const href = link.getAttribute('href');
+      if (href === '#inicio') {
+         e.preventDefault();
+         window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      setActiveNav(href);
+      headerEl.classList.remove('hdr-hidden');
+      headerHidden = false;
+   });
 });
 
 // ── MOBILE NAV TAB ───────────────────────────────
@@ -477,7 +510,7 @@ if (!isMobile) {
 // ── LOADER ───────────────────────────────────────
 const loader = document.getElementById('loader');
 window.addEventListener('load', () => {
-   setTimeout(() => { loader.classList.add('done'); }, 1600);
+   setTimeout(() => { loader.classList.add('done'); }, 800);
 });
 
 // ── DARK MODE ────────────────────────────────────
@@ -590,51 +623,6 @@ modalClose.addEventListener('click', closeModal);
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// ── RADAR CHART ──────────────────────────────────
-(function drawRadar() {
-   const svg = document.getElementById('radar-chart');
-   if (!svg) return;
-   const cx = 100, cy = 100, maxR = 75;
-   const axes = [
-      { label: 'Frontend', value: 0.95 },
-      { label: 'Backend', value: 0.82 },
-      { label: 'Mobile', value: 0.78 },
-      { label: 'DevOps', value: 0.68 },
-      { label: 'Database', value: 0.80 },
-      { label: 'Testing', value: 0.72 },
-   ];
-   const n = axes.length;
-   const angleStep = (Math.PI * 2) / n;
-
-   function polar(i, r) {
-      const angle = angleStep * i - Math.PI / 2;
-      return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
-   }
-
-   let html = '';
-   // grid rings
-   [0.25, 0.5, 0.75, 1].forEach(pct => {
-      const pts = Array.from({ length: n }, (_, i) => polar(i, maxR * pct).join(',')).join(' ');
-      html += `<polygon points="${pts}" fill="none" stroke="var(--border)" stroke-width="0.5"/>`;
-   });
-   // axis lines
-   for (let i = 0; i < n; i++) {
-      const [x, y] = polar(i, maxR);
-      html += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--border)" stroke-width="0.5"/>`;
-   }
-   // data polygon
-   const dataPts = axes.map((a, i) => polar(i, maxR * a.value).join(',')).join(' ');
-   html += `<polygon points="${dataPts}" fill="rgba(10,10,10,.08)" stroke="var(--black)" stroke-width="1.5"/>`;
-   // dots + labels
-   axes.forEach((a, i) => {
-      const [dx, dy] = polar(i, maxR * a.value);
-      html += `<circle cx="${dx}" cy="${dy}" r="3" fill="var(--black)"/>`;
-      const [lx, ly] = polar(i, maxR + 14);
-      const anchor = lx < cx - 5 ? 'end' : lx > cx + 5 ? 'start' : 'middle';
-      html += `<text x="${lx}" y="${ly + 3}" text-anchor="${anchor}" font-size="8" font-weight="600" fill="var(--gray)" font-family="Manrope,sans-serif">${a.label}</text>`;
-   });
-   svg.innerHTML = html;
-})();
 
 // ── i18n TRANSLATION SYSTEM ─────────────────────
 const i18n = {

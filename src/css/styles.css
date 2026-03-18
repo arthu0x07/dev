@@ -91,6 +91,9 @@ body {
 /* ── PAGE ── */
 .page { position: relative; z-index: 1; max-width: 1440px; width: 100%; margin: 0 auto; }
 
+/* anchor offset for sticky header */
+[id] { scroll-margin-top: 80px; }
+
 /* ═══════════════════════════════
    HEADER
 ═══════════════════════════════ */
@@ -527,7 +530,7 @@ footer.visible { opacity: 1; transform: none; }
 }
 @keyframes loaderPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.97)} }
 .loader-bar { width: 120px; height: 2px; background: var(--border); border-radius: 2px; overflow: hidden; }
-.loader-fill { width: 0; height: 100%; background: var(--black); animation: loaderFill 1.4s cubic-bezier(.4,0,.2,1) forwards; }
+.loader-fill { width: 0; height: 100%; background: var(--black); animation: loaderFill .7s cubic-bezier(.4,0,.2,1) forwards; }
 @keyframes loaderFill { to { width: 100%; } }
 
 /* ═══════════════════════════════
@@ -653,11 +656,23 @@ footer.visible { opacity: 1; transform: none; }
   border-radius: 100px; padding: 4px 12px; letter-spacing: .03em;
 }
 
+
 /* ═══════════════════════════════
-   RADAR CHART
+   BACK TO TOP
 ═══════════════════════════════ */
-.radar-wrap { max-width: 280px; margin-bottom: 24px; }
-.radar-svg { width: 100%; height: auto; }
+.back-to-top {
+  position: fixed; bottom: 28px; right: 28px; z-index: 900;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--black); color: var(--white);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: translateY(12px);
+  transition: opacity .3s, transform .3s, background .2s;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
+}
+.back-to-top.visible { opacity: 1; transform: none; pointer-events: auto; }
+.back-to-top:hover { background: var(--gray); }
 
 /* ═══════════════════════════════
    CUSTOM SCROLLBAR
@@ -736,8 +751,56 @@ html { scrollbar-width: thin; scrollbar-color: var(--border) var(--white); }
   .tl-item { padding-left: 20px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .logo-strip { padding: 20px 16px; }
-  .radar-wrap { max-width: 220px; }
 }
 @media (max-width: 420px) {
   .cases-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════
+   PRINT
+═══════════════════════════════ */
+@media print {
+  /* reset to light, remove decorative elements */
+  :root { --black: #000; --white: #fff; --gray: #555; --light: #f5f5f5; --border: #ccc; }
+  body::before, #particles-canvas, #hero-3d, #cursor, #cursor-ring,
+  #progress-bar, .side-nav, .nav-tab, .back-to-top, #loader,
+  .hero-scroll, .card-glare, .section-divider, .loader-bar,
+  .theme-toggle, .lang-toggle { display: none !important; }
+
+  body { background: #fff; color: #000; font-size: 11pt; }
+  .page { max-width: 100%; }
+  * { animation: none !important; transition: none !important; opacity: 1 !important;
+      transform: none !important; filter: none !important; }
+
+  header { position: static; background: #fff; box-shadow: none; border-bottom: 1px solid #ccc; }
+  .hero { min-height: auto; padding: 24pt 0; }
+  .hero-inner { text-align: left; }
+  .hero-badges { justify-content: flex-start; }
+  .hero-badge { opacity: 1; border-color: #ccc; }
+
+  section { padding: 18pt 0; break-inside: avoid; }
+  .cases-grid { grid-template-columns: repeat(2, 1fr); gap: 8pt; }
+  .case-card { aspect-ratio: auto; border-radius: 8pt; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .case-hover-cta { display: none; }
+
+  .timeline { padding-left: 16pt; }
+  .tl-item { padding-bottom: 14pt; break-inside: avoid; }
+  .tl-desc { max-width: 100%; }
+
+  .about-grid { gap: 18pt; }
+  .bio-photo { width: 80pt; height: 80pt; }
+  .skill-pill { opacity: 1; border-color: #ccc; }
+
+  .contact-wrap { background: #f5f5f5; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .social-row, .magnetic { transform: none; }
+
+  .logo-strip { padding: 10pt 0; }
+  .logo-strip-track { mask-image: none; }
+  .logo-strip-slide { animation: none; }
+
+  .stats-grid { gap: 8pt; }
+  .stat-card { border-color: #ccc; background: #f9f9f9; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+
+  .modal-overlay { display: none !important; }
+  footer { border-top: 1px solid #ccc; padding: 10pt 0; }
 }

@@ -25,6 +25,7 @@
   <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800&family=DotGothic16&display=swap" as="style" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;600;700;800&family=DotGothic16&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
@@ -390,11 +391,6 @@
           <a href="mailto:arthur@email.com" class="bio-link">Email</a>
         </div>
 
-        <!-- Radar Chart -->
-        <div class="radar-wrap reveal-scale">
-          <svg id="radar-chart" viewBox="0 0 200 200" class="radar-svg"></svg>
-        </div>
-
         <div class="skills-row">
           <span class="skill-pill">JavaScript</span>
           <span class="skill-pill">TypeScript</span>
@@ -474,6 +470,11 @@
 
 </div><!-- .page -->
 
+<!-- ═══ BACK TO TOP ═══ -->
+<button class="back-to-top" id="back-to-top" aria-label="Back to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
 <!-- ═══ CASE MODAL ═══ -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
@@ -489,7 +490,28 @@
 </div>
 
 <script src="js/scripts.js"></script>
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-<script src="js/hero3d.js"></script>
+<script>
+// lazy load Three.js only when hero is near viewport
+(function() {
+  var hero = document.querySelector('.hero');
+  if (!hero) return;
+  var loaded = false;
+  var obs = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting && !loaded) {
+      loaded = true;
+      var s = document.createElement('script');
+      s.src = 'https://unpkg.com/three@0.160.0/build/three.min.js';
+      s.onload = function() {
+        var s2 = document.createElement('script');
+        s2.src = 'js/hero3d.js';
+        document.body.appendChild(s2);
+      };
+      document.body.appendChild(s);
+      obs.disconnect();
+    }
+  }, { rootMargin: '200px' });
+  obs.observe(hero);
+})();
+</script>
 </body>
 </html>
