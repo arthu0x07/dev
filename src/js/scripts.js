@@ -19,7 +19,7 @@ class P {
       this.vx = (Math.random() - .5) * .42;
       this.vy = (Math.random() - .5) * .42;
       this.rad = Math.random() * 1.5 + .5;
-      this.a = Math.random() * .3 + .08;
+      this.a = Math.random() * .3 + 1;
    }
    update() {
       this.x += this.vx; this.y += this.vy;
