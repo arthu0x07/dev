@@ -1,0 +1,355 @@
+/* ═══ CYBER DASHBOARD ═══ */
+:root {
+    --cyber-green: #00ff41;
+    --cyber-dark: #0a0a0a;
+    --cyber-bg: rgba(10, 10, 10, 0.98);
+}
+
+.cyber-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--cyber-bg);
+    z-index: 100000;
+    display: flex;
+    font-family: 'DotGothic16', monospace;
+    color: var(--cyber-green);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+
+.cyber-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* CRT/Matrix Effects */
+.cyber-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 3px, 3px 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Sidebar */
+.cyber-sidebar {
+    width: 260px;
+    border-right: 1px solid rgba(0, 255, 65, 0.2);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.cyber-logo {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 3rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--cyber-green);
+}
+
+.cyber-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.cyber-nav-item {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--cyber-green);
+    padding: 0.8rem 1rem;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.cyber-nav-item:hover, .cyber-nav-item.active {
+    background: rgba(0, 255, 65, 0.1);
+    border-color: var(--cyber-green);
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+}
+
+/* Main Content */
+.cyber-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 3rem;
+    overflow-y: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.cyber-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+    padding-bottom: 1rem;
+}
+
+.cyber-close {
+    background: transparent;
+    border: 1px solid var(--cyber-green);
+    color: var(--cyber-green);
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.cyber-close:hover {
+    background: var(--cyber-green);
+    color: var(--cyber-dark);
+}
+
+/* Tool View */
+.tool-view {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.tool-view.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tool-title { font-size: 2rem; margin-bottom: 0.5rem; }
+.tool-desc { opacity: 0.6; margin-bottom: 2.5rem; }
+
+/* Input Group */
+.input-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 255, 65, 0.3);
+}
+
+.cyber-input {
+    background: transparent;
+    border: none;
+    color: var(--cyber-green);
+    padding: 1rem;
+    flex: 1;
+    font-family: inherit;
+    font-size: 1.1rem;
+    outline: none;
+}
+
+.cyber-btn {
+    background: var(--cyber-green);
+    color: var(--cyber-dark);
+    border: none;
+    padding: 0 2rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cyber-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Result Card */
+.result-container {
+    background: rgba(0, 255, 65, 0.03);
+    border: 1px solid rgba(0, 255, 65, 0.1);
+    padding: 2rem;
+    border-radius: 4px;
+    min-height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.stat-box {
+    border-left: 2px solid var(--cyber-green);
+    padding-left: 1rem;
+}
+
+.stat-label { font-size: 0.8rem; opacity: 0.5; margin-bottom: 0.3rem; }
+.stat-value { font-size: 1.2rem; word-break: break-all; }
+
+/* Loader */
+.cyber-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem;
+}
+
+.scan-progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 255, 65, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.scan-bar {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0%;
+    background: var(--cyber-green);
+    box-shadow: 0 0 10px var(--cyber-green);
+    transition: width 0.3s;
+}
+
+/* Badge Trigger */
+.cyber-badge {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--cyber-green);
+    color: var(--cyber-green);
+    padding: 2px 8px;
+    font-size: 10px;
+    font-family: 'DotGothic16', monospace;
+    cursor: pointer;
+    z-index: 999;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+}
+
+.cyber-badge:hover {
+    opacity: 1;
+    background: var(--cyber-green);
+    color: #000;
+}
+
+/* Stream / Cinema Node */
+.stream-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border: 1px solid var(--cyber-green);
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+}
+
+.cyber-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.stream-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 255, 65, 0.8);
+    color: #000;
+    padding: 2px 10px;
+    font-size: 10px;
+    z-index: 10;
+    text-transform: uppercase;
+}
+
+.stream-stats {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--cyber-green);
+    padding: 10px;
+    font-size: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stream-glitch {
+    position: absolute;
+    inset: 0;
+    background: url('https://media.giphy.com/media/oEI9uWUicGv5K/giphy.gif');
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.cinema-mode .cyber-video {
+    object-fit: contain;
+}
+
+/* Chat Tool */
+.chat-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-header {
+    font-size: 0.8rem;
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 255, 65, 0.2);
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.chat-feed {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 65, 0.2);
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    min-height: 300px;
+    max-height: 50vh;
+}
+
+.chat-msg {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    word-break: break-all;
+}
+
+.chat-user { color: var(--cyber-green); font-weight: bold; }
+.chat-time { font-size: 0.7rem; opacity: 0.4; margin-left: 0.8rem; }
+
+.chat-input-row {
+    display: flex;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .cyber-overlay { flex-direction: column; }
+    .cyber-sidebar { width: 100%; height: auto; padding: 1rem; flex-direction: row; overflow-x: auto; }
+    .cyber-logo { display: none; }
+    .cyber-nav { flex-direction: row; }
+    .cyber-content { padding: 1.5rem; }
+}

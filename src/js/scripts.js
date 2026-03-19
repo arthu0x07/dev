@@ -115,7 +115,7 @@ if (!isMobile) {
    document.addEventListener('mouseover', e => {
       const el = e.target.closest('.case-card');
       if (el) { setCursorState('card'); return; }
-      if (e.target.closest('a, button, .btn-primary, .skill-pill, .theme-toggle, .lang-toggle, .social-row a')) {
+      if (e.target.closest('a, button, .btn-primary, .skill-pill, .theme-toggle, .lang-toggle, .social-row a, .logo')) {
          setCursorState('hover'); return;
       }
       setCursorState(null);
@@ -527,12 +527,28 @@ if (!isMobile) {
    });
 }
 
+// ── TEXT SPLIT (hero subtitle) ───────────────────
+const heroSub = document.querySelector('.hero-sub');
+function splitText(el) {
+   const text = el.textContent;
+   el.dataset.original = text;
+   el.innerHTML = text.split('').map(function (ch, i) {
+      if (ch === ' ') return '<span class="char" style="transition-delay:' + (i * 18) + 'ms">&nbsp;</span>';
+      return '<span class="char" style="transition-delay:' + (i * 18) + 'ms">' + ch + '</span>';
+   }).join('');
+}
+if (heroSub) splitText(heroSub);
+
 // ── LOADER + PAGE ENTRY ──────────────────────────
 const loader = document.getElementById('loader');
 window.addEventListener('load', () => {
    setTimeout(() => {
       loader.classList.add('done');
       document.querySelector('.page').classList.add('page-enter');
+      // trigger text split animation after entry
+      setTimeout(function () {
+         if (heroSub) heroSub.classList.add('split-done');
+      }, 350);
    }, 800);
 });
 
@@ -771,10 +787,9 @@ const rolesPt = [
    'full-stack.dev(construtor)',
    'mobile.app(desenvolvedor)',
 ];
-
-let currentLang = localStorage.getItem('lang') || 'en';
 const langToggle = document.getElementById('lang-toggle');
-const langLabel = langToggle.querySelector('.lang-label');
+const langLabel = document.querySelector('.lang-label');
+let currentLang = localStorage.getItem('lang') || 'en';
 
 function applyLang(lang) {
    currentLang = lang;
@@ -785,18 +800,20 @@ function applyLang(lang) {
       if (key.endsWith('_html')) {
          el.innerHTML = t[key];
       } else {
-         // for reveal-words, rebuild word wraps
          if (el.classList.contains('reveal-words')) {
             el.innerHTML = t[key].split(' ').map(w =>
                `<span class="word-wrap"><span class="word in">${w}</span></span>`
             ).join(' ');
+         } else if (el === heroSub) {
+            el.textContent = t[key];
+            splitText(el);
+            el.classList.add('split-done');
          } else {
             el.textContent = t[key];
          }
       }
    });
-   // update lang label (show opposite)
-   langLabel.textContent = lang === 'en' ? 'PT' : 'EN';
+   if (langLabel) langLabel.textContent = lang.toUpperCase();
    // update html lang
    document.documentElement.lang = lang === 'en' ? 'en' : 'pt-BR';
    // swap typing roles
@@ -813,8 +830,7 @@ langToggle.addEventListener('click', () => {
 applyLang(currentLang);
 
 // override modal open to use current lang
-const origModalCards = document.querySelectorAll('.case-card[data-modal]');
-origModalCards.forEach(card => {
+document.querySelectorAll('.case-card[data-modal]').forEach(card => {
    card.addEventListener('click', () => {
       const key = card.dataset.modal;
       const d = currentLang === 'pt' ? modalDataPt[key] : modalData[key];
@@ -829,43 +845,90 @@ origModalCards.forEach(card => {
    });
 });
 
-// ── EASTER EGG (footer logo click) ───────────────
-(function() {
+// ── CYBER MODE TRIGGER ──────────────────────────
+let cyberInput = '';
+document.addEventListener('keydown', (e) => {
+   cyberInput += e.key.toLowerCase();
+   if (cyberInput.endsWith('cyber')) {
+      triggerCyberMode();
+      cyberInput = '';
+   }
+   if (cyberInput.length > 10) cyberInput = cyberInput.slice(-10);
+});
+
+// ── CYBER MODE TRIGGER (Header Logo - Long Press 5s) ──
+let cyberPressTimer;
+const mainLogo = document.querySelector('.logo');
+if (mainLogo) {
+   mainLogo.style.cursor = 'pointer';
+   mainLogo.style.transition = 'transform 5s linear, color 0.5s, letter-spacing 0.3s';
+
+   const startPress = () => {
+      // Start scaling very slowly over 5s
+      mainLogo.style.transform = 'scale(1.2)';
+      mainLogo.style.color = 'var(--gray)'; // Subtle hint from palette
+
+      cyberPressTimer = setTimeout(() => {
+         mainLogo.style.color = 'var(--black)'; // Final state
+         triggerCyberMode();
+         cancelPress();
+      }, 5000); // 5 second hold
+   };
+
+   const cancelPress = () => {
+      clearTimeout(cyberPressTimer);
+      mainLogo.style.transform = 'scale(1)';
+      mainLogo.style.color = '';
+   };
+
+   mainLogo.addEventListener('mousedown', startPress);
+   mainLogo.addEventListener('mouseup', cancelPress);
+   mainLogo.addEventListener('mouseleave', cancelPress);
+
+   // Touch support
+   mainLogo.addEventListener('touchstart', (e) => { e.preventDefault(); startPress(); });
+   mainLogo.addEventListener('touchend', cancelPress);
+}
+
+// CyberMode is now exclusively triggered by a 5-second long press on the header logo.
+
+function triggerCyberMode() {
+   console.log('Triggering Cyber Mode...');
+   if (window.CyberMode && (window.CyberMode.overlay || window.CyberMode.terminal)) {
+      window.CyberMode.toggle();
+      return;
+   }
+   const l = document.createElement('link');
+   l.rel = 'stylesheet'; l.href = '/css/cyber.css';
+   document.head.appendChild(l);
+
+   const s = document.createElement('script');
+   s.src = '/js/cyber.js';
+   s.onload = () => { if (window.CyberMode) window.CyberMode.init(); };
+   document.body.appendChild(s);
+}
+
+// ── PARTY MODE (existing footer logo click) ──────
+(function () {
    const fLogo = document.getElementById('f-logo');
    if (!fLogo) return;
    let active = false;
-
    fLogo.addEventListener('click', () => {
       if (active) return;
       active = true;
-
-      // scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      // rainbow overlay
       const ov = document.createElement('div');
       ov.style.cssText = 'position:fixed;inset:0;z-index:99998;pointer-events:none;background:linear-gradient(135deg,rgba(255,0,0,.1),rgba(255,165,0,.1),rgba(255,255,0,.1),rgba(0,128,0,.1),rgba(0,0,255,.1),rgba(75,0,130,.1),rgba(238,130,238,.1));animation:eggRainbow 3s linear infinite;mix-blend-mode:overlay;';
       document.body.appendChild(ov);
-
-      // party styles
       const style = document.createElement('style');
       style.textContent = '@keyframes eggRainbow{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}' +
          '#particles-canvas{filter:invert(1) hue-rotate(0deg)!important;animation:eggRainbow 2s linear infinite!important;opacity:1!important;}' +
          '.hero-title{animation:eggRainbow 1.5s linear infinite!important;}' +
-         '.skill-pill{animation:eggRainbow 2s linear infinite!important;animation-delay:calc(var(--i,0)*.1s)!important;}' +
+         '.skill-pill{animation:eggRainbow 2s linear infinite!important; animation-delay:calc(var(--i,0)*.1s)!important;}' +
          '.case-card .case-bg{animation:eggRainbow 3s linear infinite!important;}' +
          '.logo,.f-logo{animation:eggRainbow 1s linear infinite!important;}';
       document.head.appendChild(style);
-
-      // set skill pill delays
       document.querySelectorAll('.skill-pill').forEach((p, i) => p.style.setProperty('--i', i));
-
-      console.log('%c✨ PARTY MODE! ✨', 'font-size:20px;font-weight:bold;color:#ff00ff;text-shadow:2px 2px #00ffff;');
-
-      setTimeout(() => {
-         ov.remove();
-         style.remove();
-         active = false;
-      }, 15000);
+      setTimeout(() => { ov.remove(); style.remove(); active = false; }, 15000);
    });
 })();

@@ -394,7 +394,9 @@ section { padding: clamp(56px,8vw,112px) var(--pad); }
   text-decoration: none; border: none; cursor: pointer;
   transition: background .2s;
 }
-.btn-primary:hover { background: #222; }
+.btn-primary:hover { background: #222; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+[data-theme="dark"] .btn-primary { background: var(--black); color: var(--white); }
+[data-theme="dark"] .btn-primary:hover { background: #ddd; box-shadow: 0 8px 24px rgba(255,255,255,.06); }
 
 .social-row { display: flex; gap: 10px; align-items: center; }
 .social-row a {
@@ -402,8 +404,9 @@ section { padding: clamp(56px,8vw,112px) var(--pad); }
   border: 1px solid var(--border); border-radius: 50%; background: var(--white);
   transition: transform .2s, border-color .2s;
 }
-.social-row a:hover { border-color: #bbb; }
-.social-row svg { width: 16px; height: 16px; }
+.social-row a:hover { border-color: var(--gray); transform: translateY(-3px) scale(1.1); }
+.social-row svg { width: 16px; height: 16px; transition: transform .2s; }
+.social-row a:hover svg { transform: scale(1.05); }
 
 /* ═══════════════════════════════
    FOOTER
@@ -459,6 +462,16 @@ body::before {
   25%{background-position:16% 4%}   37%{background-position:-5% 22%}
   50%{background-position:24% -8%}  62%{background-position:-20% 12%}
   75%{background-position:10% -18%} 87%{background-position:-14% 7%}
+}
+
+/* ── Text split (char by char) ── */
+.hero-sub .char {
+  display: inline-block;
+  opacity: 0; transform: translateY(12px) rotateX(40deg);
+  transition: opacity .35s ease, transform .45s cubic-bezier(.25,.46,.45,.94);
+}
+.hero-sub.split-done .char {
+  opacity: 1; transform: none;
 }
 
 /* ── Word reveal ── */
@@ -637,7 +650,8 @@ footer.visible { opacity: 1; transform: none; }
   border: 1px solid var(--border); border-radius: 16px;
   background: var(--light); transition: transform .3s, box-shadow .3s;
 }
-.stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+.stat-card:hover { transform: translateY(-6px); box-shadow: 0 12px 32px rgba(0,0,0,.12); }
+[data-theme="dark"] .stat-card:hover { box-shadow: 0 12px 32px rgba(255,255,255,.04); }
 .stat-number {
   font-size: clamp(28px, 4vw, 44px); font-weight: 800;
   letter-spacing: -.02em; line-height: 1; margin-bottom: 6px;
