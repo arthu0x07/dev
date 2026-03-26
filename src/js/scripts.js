@@ -555,9 +555,7 @@ window.addEventListener('load', () => {
 // ── DARK MODE ────────────────────────────────────
 const themeToggle = document.getElementById('theme-toggle');
 const html = document.documentElement;
-const savedTheme = localStorage.getItem('theme');
-if (savedTheme) html.setAttribute('data-theme', savedTheme);
-else html.setAttribute('data-theme', 'dark');
+html.setAttribute('data-theme', 'dark');
 
 themeToggle.addEventListener('click', () => {
    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';

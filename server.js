@@ -660,13 +660,16 @@ function getMockData(tool, target) {
 //  STATIC FILES  — registered AFTER all API/route handlers
 // ─────────────────────────────────────────────────────────────────────────────
 app.use(
-  express.static(path.join(__dirname, 'src'), {
+  express.static(path.join(__dirname, IS_PROD ? 'dist' : 'src'), {
     etag: true,
     lastModified: true,
-    maxAge: IS_PROD ? '7d' : 0,
+    maxAge: IS_PROD ? '30d' : 0, // Increased to 30d for better optimization
     setHeaders: (res, filePath) => {
       if (filePath.endsWith('.html')) {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      } else if (filePath.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$/)) {
+        // Immutable-like caching for versioned assets
+        res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
       }
     },
   })
