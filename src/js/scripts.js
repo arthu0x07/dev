@@ -897,11 +897,11 @@ function triggerCyberMode() {
       return;
    }
    const l = document.createElement('link');
-   l.rel = 'stylesheet'; l.href = '/css/cyber.css';
+   l.rel = 'stylesheet'; l.href = 'css/cyber.css';
    document.head.appendChild(l);
 
    const s = document.createElement('script');
-   s.src = '/js/cyber.js';
+   s.src = 'js/cyber.js';
    s.onload = () => { if (window.CyberMode) window.CyberMode.init(); };
    document.body.appendChild(s);
 }
