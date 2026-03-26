@@ -20,13 +20,14 @@
   --text-tertiary: #ccc;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 ::selection { background: var(--black); color: var(--white); }
 body {
   background: var(--white);
   color: var(--black);
   font-family: 'Manrope', sans-serif;
   overflow-x: hidden;
+  width: 100%;
 }
 
 /* ── CANVAS ── */
@@ -338,7 +339,7 @@ section { padding: clamp(56px,8vw,112px) var(--pad); }
 .bio-link:hover::after { width: 100%; }
 .bio-link:hover { color: var(--gray); }
 
-.skills-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.skills-row { display: flex; flex-wrap: wrap; gap: 8px; max-width: 100%; }
 .skill-pill {
   font-size: 11px; font-weight: 600; border: 1px solid var(--border);
   border-radius: 100px; padding: 5px 14px;
