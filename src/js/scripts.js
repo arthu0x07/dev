@@ -786,7 +786,6 @@ const rolesPt = [
    'mobile.app(desenvolvedor)',
 ];
 const langToggle = document.getElementById('lang-toggle');
-const langLabel = document.querySelector('.lang-label');
 let currentLang = localStorage.getItem('lang') || 'en';
 
 function applyLang(lang) {
@@ -811,7 +810,7 @@ function applyLang(lang) {
          }
       }
    });
-   if (langLabel) langLabel.textContent = lang.toUpperCase();
+   // flag visibility is handled by CSS via [lang] attribute
    // update html lang
    document.documentElement.lang = lang === 'en' ? 'en' : 'pt-BR';
    // swap typing roles

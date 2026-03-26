@@ -597,15 +597,16 @@ footer.visible { opacity: 1; transform: none; }
 ═══════════════════════════════ */
 .header-right { display: flex; align-items: center; gap: 20px; }
 .lang-toggle {
-  height: 30px; padding: 0 10px; border-radius: 100px;
+  width: 36px; height: 36px; border-radius: 50%;
   border: 1px solid var(--border); background: transparent;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   color: var(--black); transition: background .2s, border-color .2s;
-  font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 700;
-  letter-spacing: .04em;
 }
 .lang-toggle:hover { background: var(--light); }
-.lang-label { pointer-events: none; }
+.lang-toggle svg { pointer-events: none; }
+.lang-toggle .flag-us { display: none; }
+[lang="pt-BR"] .lang-toggle .flag-br { display: none; }
+[lang="pt-BR"] .lang-toggle .flag-us { display: block; }
 
 .theme-toggle {
   width: 36px; height: 36px; border-radius: 50%;
