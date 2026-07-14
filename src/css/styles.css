@@ -26,7 +26,6 @@ body {
   background: var(--white);
   color: var(--black);
   font-family: 'Manrope', sans-serif;
-  overflow-x: hidden;
   width: 100%;
 }
 
